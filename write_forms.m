@@ -24,14 +24,15 @@ function ComputeNonliftable(d : bd := 100, levelLowerBd := 0)
 	if Norm(level) lt levelLowerBd then
 	    continue;
 	end if;
-	// wt1 := BianchiWeight(F, 0, 0);
-	// B1 := BianchiCohomologySpace(level,wt1);
+	wt1 := BianchiWeight(F, 0, 0);
+	B1 := BianchiCohomologySpace(level,wt1);
 	for p in L[2] do
 	    wt2:=BianchiWeight(F, 0,0 : char:= Integers()!p);
 	    B2 := BianchiCohomologySpace(level,wt2);
 	    SetHeckeBound(B2, bd);
+	    BG := GenuineSubspace(B1,B2);
 	    for f in Eigenforms(B2) do
-		if not IsEisenstein(f) then
+		if not IsEisenstein(f) and f in BG and f`eigenspaceDim eq 1 then
 		    WriteClass(f, filename : labels := labels);
 		    print "Wrote class to file!";
 		end if;
