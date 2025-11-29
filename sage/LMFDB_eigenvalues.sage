@@ -130,9 +130,12 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
                 try:
                     ev.append(ZZ(x))
                 except TypeError:
-                    print(f"Failed to coerce {x} to integer")
-                    is_valid = False
-                    break
+                    if x == "-":
+                        ev.append(ZZ(0))
+                    else:
+                        print(f"Failed to coerce {x} to integer")
+                        is_valid = False
+                        break
             if is_valid:
                 modp_evs.append(HeckeEig(ev, lvl, p))
 
