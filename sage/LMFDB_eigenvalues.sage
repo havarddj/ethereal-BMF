@@ -183,7 +183,7 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
                 non_LR_primes = []
                 for i, pp in enumerate(prime_list):
                     if pp.divides(hit_lvl) and not pp.divides(p*lvl):
-                        modp_diff = (hit_ev[i]^2 - (1 + norm(pp))^2) % p
+                        modp_diff = (ev[i]^2 - (1 + norm(pp))^2) % p
                         if  modp_diff != 0:
                             non_LR_primes.append([modp_diff, prime_label(pp)])
                 if non_LR_primes != []:
