@@ -27,7 +27,7 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 	wt1 := BianchiWeight(F, 0, 0);
 	B1 := BianchiCohomologySpace(level,wt1);
 	for p in L[2] do
-	    wt2:=BianchiWeight(F, 0,0 : char:= Integers()!p);
+	    wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
 	    B2 := BianchiCohomologySpace(level,wt2);
 	    SetHeckeBound(B2, heckeBd);
 	    BG := GenuineSubspace(B1,B2);
