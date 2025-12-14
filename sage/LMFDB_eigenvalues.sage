@@ -21,10 +21,10 @@ class HeckeEig():
         self.evals = evals
         self.lvl = lvl
         self.prime = p
-        self.rational_lifts = []         
+        self.rational_lifts = []
 
     def __repr__(self):
-        return f"Mod {self.p()} Hecke eigenvalue system: {self.eigenvalues()}"
+        return f"Mod {self.p()} Bianchi eigenvalue system of level {self.level_label()}"
 
     # Helper methods to make code below cleaner.
     # Not strictly necessary, but prevents us from accidentally
@@ -67,6 +67,29 @@ class HeckeEig():
                     'evals': self.eigenvalues(),
                     'p': self.p(),
                     }
+
+    # return list of primes not satisfying the level raising condition
+    def non_LR_primes(self, lift):
+        non_LR_primes = []
+        p = self.p()
+        prime_list = primes_iter(self.level().number_field())
+        for i, pp in enumerate(prime_list):
+            if i >= len(self.eigenvalues()):
+                return non_LR_primes
+            elif pp.divides(lift['level']) and not pp.divides(p*self.level()):
+                modp_diff = (self.eigenvalues()[i]^2 - (1 + norm(pp))^2) % p
+                if modp_diff != 0:
+                    non_LR_primes.append(prime_label(pp))
+
+    # return dict of pairs lift_label: [ideal_labels] which fail the level raising condition
+    def non_LR_lifts(self):
+        lift_dict = {}
+        for lift in self.get_rational_lifts():
+            lift_dict[lift['label']] = self.non_LR_primes(lift)
+        return lift_dict
+            
+        
+
         
         
         
@@ -179,24 +202,7 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
                    for i in range(min_len)):
                 print("Found rational lift for", hecke_ev)
                 hecke_ev.add_rational_lift({'label': hit['label'], 'evals': hit_ev, 'level': hit_lvl})
-                # test level raising condition
-                non_LR_primes = []
-                for i, pp in enumerate(prime_list):
-                    if pp.divides(hit_lvl) and not pp.divides(p*lvl):
-                        modp_diff = (ev[i]^2 - (1 + norm(pp))^2) % p
-                        if  modp_diff != 0:
-                            non_LR_primes.append([modp_diff, prime_label(pp)])
-                if non_LR_primes != []:
-                    print(f"Lift for Mod {p} ev system {ev} failed level raising condition")
-                if p > 3:
-                    for val, label in non_LR_primes:
-                        print(f"Difference mod {p} is {val} for coeff of {label}")
             
-            # TODO: Make sure magma evals are ordered the same way!
-            # TODO: Find out exactly what mismatches we should expect.
-            # Currently, accept different eigenvalues away from level and p.
-
-
     return modp_evs
 
 def string_to_level(K, str):
@@ -259,66 +265,3 @@ def test_write():
             if not h.has_rational_lift():
                 writer.writerow(h.csv_dict())
     print(f"Wrote unliftable eigenvalues to", f'd{d}_unliftable.csv')
-
-    
-
-    
-
-# def test_search():
-#     R.<x> = PolynomialRing(ZZ)
-#     d = 3
-#     targetEigs = [ 1, 1, 1, 0, 0, 1, 0, 2, 2, 0, 2 ]
-#     p = 3
-
-#     K.<w> = NumberField(x^2+d)
-
-#     badPrimeIdeals = [w, 1-3*w]
-
-
-#     badPrimeNorms = [norm(u) for u in badPrimeIdeals]
-#     levelIdeal = prod([K.ideal(u) for u in badPrimeIdeals])
-
-
-#     labels = []
-#     all_lift_primes = []
-
-#     for i in range(len(ll)):
-#         if all([u in ll[i]["level_bad_primes"] for u in badPrimeNorms]):
-#             currentEigs = ll[i]["hecke_eigs"][0:len(targetEigs)]
-#             I = K.ideal(StringToLevel(ll[i]["level_gen"]))
-#             ff = I.factor()
-#             II = I.intersection(levelIdeal)
-#             badPNum = len(II.factor())
-#             diffs = [mod(currentEigs[i]-targetEigs[i],p) for i in range(len(currentEigs))]
-#             if diffs.count(0) > len(currentEigs) - badPNum - 2 and II == I: 
-#                 #if True:
-#                 #ll[i]["label"]
-#                 labels.append(ll[i]["label"])
-#                 (StringToLevel(ll[i]["level_gen"])/levelIdeal).norm()
-#                 fac = (II/levelIdeal).factor()
-#                 # we add all the primes appearing in the lifting factor to a list 
-#                 lift_primes = [fac[i][0].gens_reduced()[0] for i in range( len(fac) )]
-#                 for i in range(len(lift_primes)):
-#                         if not lift_primes[i] in all_lift_primes:
-#                         all_lift_primes.append(lift_primes[i])
-#                         #currentEigs
-#                         #diffs
-#                         # ""
-
-
-
-
-
-##
-
-# ECs = db.ec_nfcurves
-
-
-# ranks = []
-
-# for u in labels:
-
-# 	infoEC = {}
-# 	LEC = ECs.search({"label": u + "1"}, projection=['rank'], limit=100, info = infoEC)
-# 	ranks.append(LEC[0]["rank"])
-
