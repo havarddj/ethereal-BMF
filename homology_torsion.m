@@ -88,17 +88,17 @@ ExtraModPClasses:=function(level : GL := true)
 		  end function;
 
 // Compute levels N and primes p where we expect nonlifting of mod p classes of level N.
-function ComputeLevelsAndPrimes(d : bd := 1000)
+function ComputeLevelsAndPrimes(d : lowerBound := 1, upperBound:= 1000)
     assert d in [1,2,3,7,11];
     _<x> := PolynomialRing(Rationals());
     // F := NumberField(x^2+d);
     F := QuadFld(d);
     sigma := Automorphisms(F)[2];
 
-    Ids := IdealsUpTo(bd,F);
+    Ids := IdealsUpTo(upperBound,F);
     Ids_no_conj := [];
     for u in Ids do 
-	if not sigma(u) in Ids_no_conj then 
+	if not sigma(u) in Ids_no_conj and Norm(u) ge lowerBound then 
 	    Append(~Ids_no_conj,u);
 	end if;
     end for;

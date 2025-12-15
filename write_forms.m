@@ -5,7 +5,7 @@ load "homology_torsion.m";
 // Compute nonliftable eigenvalue systems with level at least levelLowerBd
 function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLowerBd := 0)
     print "Computing H_1 to find nonliftable forms";
-    levels_and_primes := ComputeLevelsAndPrimes(d : bd := levelUpperBd);
+    levels_and_primes := ComputeLevelsAndPrimes(d : lowerBound:= levelLowerBd, upperBound := levelUpperBd);
     print "Finished computing H_1";
     
     F:=QuadFld(d);
