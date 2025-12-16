@@ -38,8 +38,8 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 			print "Wrote class to file!";
 		    end if;
 		end for;
-	    catch e;
-		fprintf filename, "%o; %o; %o\n", LMFDBLabel(level);
+	    catch err;
+		fprintf filename, "%o; %o; ERROR\n", LMFDBLabel(level), p;
 	    end try;
 	end for;
     end for;
