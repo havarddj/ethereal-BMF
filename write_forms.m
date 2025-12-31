@@ -15,7 +15,7 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
     labels := [LMFDBLabel(pp) : pp in SortByLMFDBLabel(PrimesUpTo(heckeBd, F)) ];
 
     // need to mess around a bit to make sure we don't print the final semicolon
-    fprintf filename, "level;p;%o\n", Join(labels, ";");
+    fprintf filename, "level;p;%o;Coeff_minpoly\n", Join(labels, ";");
 
     for L in levels_and_primes do
 	level_gen := L[1];
