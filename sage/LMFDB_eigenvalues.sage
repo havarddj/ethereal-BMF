@@ -14,6 +14,21 @@ SEARCH_COUNT = ZZ(1e6)
 # NOTE: We cannot search on Hecke eigenvalue modulo p because the 'hecke_eigs' field is jsonb, not array.
 # So we have to search through all the forms. 
 
+def QuadFld(d):
+    """
+    Helper function to create quadratic number
+    field with monogenic integer ring}
+    """
+    if (d-3) % 4 == 0:
+        pol = x^2-x+(d+1)/4
+    else:
+        pol = x^2+d
+
+    F.<t> = NumberField(pol)
+    ZF = F.maximal_order()
+
+    return F
+
 class HeckeEig():
     # list of rational lifts of Hecke eigenvalue system
     # can't make it set bc/ lists are not hashable
@@ -68,8 +83,10 @@ class HeckeEig():
                     'p': self.p(),
                     }
 
-    # return list of primes not satisfying the level raising condition
     def non_LR_primes(self, lift):
+        """
+        return list of primes not satisfying the level raising condition
+        """
         non_LR_primes = []
         p = self.p()
         prime_list = primes_iter(self.field())
@@ -81,13 +98,15 @@ class HeckeEig():
                 if modp_diff != 0:
                     non_LR_primes.append(prime_label(pp))
 
-    # return dict of pairs lift_label: [ideal_labels] which fail the level raising condition
     def non_LR_lifts(self):
+        """
+        return dict of pairs lift_label: [ideal_labels] which fail the level raising condition
+        """
         lift_dict = {}
         for lift in self.get_rational_lifts():
             lift_dict[lift['label']] = self.non_LR_primes(lift)
         return lift_dict
-
+    
     def LR_primes(self, bd=100):
         LR_primes = []
         p = self.p()
@@ -98,12 +117,6 @@ class HeckeEig():
                 modp_diff = (self.eigenvalues()[i]^2 - (1 + norm(pp))^2) % p
                 if modp_diff == 0:
                     LR_primes.append(prime_label(pp))
-            
-        
-            
-        
-
-        
         
         
 
@@ -140,7 +153,7 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
     """
 
     R.<x> = PolynomialRing(ZZ)
-    K.<t> = NumberField(x^2 + d)
+    K = QuadFld(d)
     BMFs = db.bmf_forms
     OK = K.maximal_order()
     label = f"2.0.{K.discriminant().abs()}.1"
