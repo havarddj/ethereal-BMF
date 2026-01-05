@@ -72,7 +72,7 @@ class HeckeEig():
     def non_LR_primes(self, lift):
         non_LR_primes = []
         p = self.p()
-        prime_list = primes_iter(self.level().number_field())
+        prime_list = primes_iter(self.field())
         for i, pp in enumerate(prime_list):
             if i >= len(self.eigenvalues()):
                 return non_LR_primes
@@ -87,6 +87,19 @@ class HeckeEig():
         for lift in self.get_rational_lifts():
             lift_dict[lift['label']] = self.non_LR_primes(lift)
         return lift_dict
+
+    def LR_primes(self, bd=100):
+        LR_primes = []
+        p = self.p()
+        for i,pp in enumerate(primes_iter(self.field())):
+            if pp.norm() > bd or i >= len(self.eigenvalues()):
+                return LR_primes
+            else:
+                modp_diff = (self.eigenvalues()[i]^2 - (1 + norm(pp))^2) % p
+                if modp_diff == 0:
+                    LR_primes.append(prime_label(pp))
+            
+        
             
         
 
@@ -200,7 +213,7 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
 
             if all(((ev[i] - hit_ev[i]) % p == 0 or prime_list[i].divides(p*hit_lvl))
                    for i in range(min_len)):
-                print("Found rational lift for", hecke_ev)
+                print("Found rational lift for", hecke_ev, "of level", ideal_label(hit_lvl))
                 hecke_ev.add_rational_lift({'label': hit['label'], 'evals': hit_ev, 'level': hit_lvl})
             
     return modp_evs
