@@ -71,17 +71,16 @@ class HeckeEig():
 
     def csv_dict(self):
         if self.has_rational_lift():
-            return {'disc': self.field().discriminant(),
+            return {'level': self.level_label(),
                     'evals': self.eigenvalues(),
                     'p': self.p(),
-                    'lift_labels': [x[0] for x in self.get_rational_lifts()],
-                    'lift_evs': [x[1] for x in self.get_rational_lifts()],
+                    'lift_labels': [x['label'] for x in self.get_rational_lifts()],
+                    'lift_evs': [x['evals'] for x in self.get_rational_lifts()],
                     }
         else:
-            return {'disc': self.field().discriminant(),
+            return {'level': self.level_label(),
                     'evals': self.eigenvalues(),
-                    'p': self.p(),
-                    }
+                    'p': self.p(),}
 
     def non_LR_primes(self, lift):
         """
@@ -231,28 +230,6 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
             
     return modp_evs
 
-def string_to_level(K, str):
-    """
-    Convert the LMFDB level 'str' into an element of the number field K
-    """
-    
-    w = K.gen()
-    strlist = list(str)
-    if strlist.count("+") == 1:
-        plusind = strlist.index("+")
-        onecoeff = "".join(strlist[0:plusind])
-        wcoeff = "".join(strlist[plusind+1:len(strlist)-1])
-        if onecoeff == "":
-            onecoeff = 1
-        if wcoeff == "":
-            wcoeff = 1
-            return int(onecoeff) + int(wcoeff)*w
-        elif strlist.count("t") == 1:
-            return int("".join(strlist[0:len(strlist)-1]))*w
-        else:
-            return K(int("".join(strlist[0:len(strlist)-1])))
-
-
 def test(d, find_all_lifts=False):
     modp_evs = find_congruent_forms(d, find_all_lifts=find_all_lifts)
 
@@ -271,11 +248,10 @@ def test(d, find_all_lifts=False):
     print(*(x for x in modp_evs if not x.has_rational_lift()), sep='\n')
     return modp_evs
 
-def test_write():
-    d = 2
+def test_write(d):
     modp_evs = find_congruent_forms(d)
     with open(f'd{d}_liftable.csv', 'w', newline='') as f:
-        fieldnames = ['disc','p','evals','lift_labels', 'lift_evs']
+        fieldnames = ['level','p','evals','lift_labels', 'lift_evs']
         writer = csv.DictWriter(f, delimiter=';', fieldnames=fieldnames)
         writer.writeheader()
         for h in modp_evs:
@@ -284,10 +260,19 @@ def test_write():
     print(f"Wrote liftable eigenvalues and lifts to", f'd{d}_liftable.csv')
 
     with open(f'd{d}_unliftable.csv', 'w', newline='') as f:
-        fieldnames = ['disc','p','evals']
+        fieldnames = ['level','p','evals']
         writer = csv.DictWriter(f, delimiter=';', fieldnames=fieldnames)
         writer.writeheader()
         for h in modp_evs:
             if not h.has_rational_lift():
                 writer.writerow(h.csv_dict())
     print(f"Wrote unliftable eigenvalues to", f'd{d}_unliftable.csv')
+
+
+def find_magma_lifts(d):
+    """
+    Use magma to look for lifts which are not in the LMFDB
+    """
+    modp_evs = [ev for ev in find_congruent_forms(d) if not ev.has_rational_lift()]
+    
+    
