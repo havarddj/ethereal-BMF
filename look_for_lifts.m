@@ -55,14 +55,14 @@ function FindLifts(f : lvlBd := 100)
 	level2 := I*level1;
 
 	// B0 := BianchiCohomologySpace(level2, W0);
-	Bp := BianchiCohomologySpace(level2, Wp);
+	// Bp := BianchiCohomologySpace(level2, Wp);
 	// red_map := ReductionModPMap(B0,Bp);
 	// reduction := [Bp`down(red_map((Inverse(B0`down)(B0`forms.i)))) : i in [1..Dimension(B0`forms)]];
 	// oldspace := DegenerateSubspace(f, Bp);
         // inter := sub<Bp`forms | reduction> meet oldspace;
 
 	// if Dimension(inter) gt 0 then
-	print "Found intersection of oldspace and reduction mod p in level", LMFDBLabel(level2);
+	    // print "Found intersection of oldspace and reduction mod p in level", LMFDBLabel(level2);
 	print "Computing builtin Hecke eigenforms";
 
 	C := BianchiCuspForms(K, level2);
@@ -70,7 +70,7 @@ function FindLifts(f : lvlBd := 100)
 	    print "Testing eigenform", j;
 	    wrong_ctr := 0;
 	    is_wrong := false;
-	    primes := GoodHeckePrimes(Bp, NormBd);
+	    primes := GoodHeckePrimes(B, NormBd);
 	    E := Parent(HeckeEigenvalue(Eigenform(F), primes[1]));
 	    print "Eigenvalues of char 0 lift lie in", E, "of discriminant", Discriminant(Integers(E));
 	    p_primes := [m[1] : m in Factorization(p*Integers(E))];
@@ -96,7 +96,6 @@ function FindLifts(f : lvlBd := 100)
 	end for;
 	print "---\n";
 	// return inter;
-	// end if;
 
     end for;
     return "None found";

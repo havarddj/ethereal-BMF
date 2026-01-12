@@ -37,6 +37,7 @@ class HeckeEig():
         self.lvl = lvl
         self.prime = p
         self.rational_lifts = []
+        self.irrational_lifts = []
 
     def __repr__(self):
         return f"Mod {self.p()} Bianchi eigenvalue system of level {self.level_label()}"
@@ -59,6 +60,7 @@ class HeckeEig():
     
     def eigenvalues(self):
         return self.evals
+        # return list(self.evals.values())
 
     def add_rational_lift(self, lift):
         self.rational_lifts.append(lift)
@@ -75,7 +77,7 @@ class HeckeEig():
                     'evals': self.eigenvalues(),
                     'p': self.p(),
                     'lift_labels': [x['label'] for x in self.get_rational_lifts()],
-                    'lift_evs': [x['evals'] for x in self.get_rational_lifts()],
+                    # 'lift_evs': [x['evals'] for x in self.get_rational_lifts()],
                     }
         else:
             return {'level': self.level_label(),
@@ -174,7 +176,7 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
             p = eval(row[1])
             ev = []
             is_valid = True
-            for x in row[2:-1]:
+            for i, x in enumerate(row[2:-1]):
                 try:
                     ev.append(ZZ(x))
                 except TypeError:
@@ -249,9 +251,9 @@ def test(d, find_all_lifts=False):
     return modp_evs
 
 def test_write(d):
-    modp_evs = find_congruent_forms(d)
+    modp_evs = find_congruent_forms(d, find_all_lifts=true)
     with open(f'd{d}_liftable.csv', 'w', newline='') as f:
-        fieldnames = ['level','p','evals','lift_labels', 'lift_evs']
+        fieldnames = ['level','p','evals','lift_labels']
         writer = csv.DictWriter(f, delimiter=';', fieldnames=fieldnames)
         writer.writeheader()
         for h in modp_evs:
@@ -279,19 +281,35 @@ def load_unliftable_from_csv(d):
             modp_evs.append(HeckeEig(eval(r['evals']), lvl, ZZ(r['p'])))
     return modp_evs
 
-def find_magma_lifts(d):
+def ul_find_magma_lifts(d):
     """
     Use magma to look for lifts which are not in the LMFDB
     """
+    F = QuadFld(d)
     # modp_evs = [ev for ev in find_congruent_forms(d) if not ev.has_rational_lift()]
     modp_evs = load_unliftable_from_csv(d)
+    modp_evs = [h for h in modp_evs if h.LR_primes()]
+    # sort in order to
+    modp_evs.sort(key= lambda h: prime_from_label(F,h.LR_primes()[0]).norm())
     magma.attach_spec("../../spec")
     magma.load("../look_for_lifts.m")
     for h in modp_evs:
-        print(h.p(), h.LR_primes())
-        # magma.eval(f"f := LoadForm({d}, {h.p()}, \"{h.level_label()}\", {h.eigenvalues()});")
-        # magma.eval("print f;")
-        # magma.eval(f"FindLifts(f);")
-        
+        print("Looking for lifts of", h, "with level raising primes", h.LR_primes())
+        magma.eval(f"f := LoadForm({d}, {h.p()}, \"{h.level_label()}\", {h.eigenvalues()});")
+        magma.eval("print f;")
+        lift = magma.eval(f"FindLifts(f);")
+        print(lift)
+        h.irrational_lifts.append(lift)
+    return modp_evs
+    
+
+def ul_print_LR_primes(d):
+    F = QuadFld(d)
+    # modp_evs = [ev for ev in find_congruent_forms(d) if not ev.has_rational_lift()]
+    modp_evs = load_unliftable_from_csv(d)
+    modp_evs = [h for h in modp_evs if h.LR_primes()]
+
+    for h in modp_evs:
+        print(h.level_label(),h.p(),h.LR_primes())
         
     
