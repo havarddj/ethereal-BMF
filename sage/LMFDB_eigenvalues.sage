@@ -268,11 +268,30 @@ def test_write(d):
                 writer.writerow(h.csv_dict())
     print(f"Wrote unliftable eigenvalues to", f'd{d}_unliftable.csv')
 
+def load_unliftable_from_csv(d):
+    K = QuadFld(d)
+    modp_evs = []
+    with open(f'd{d}_unliftable.csv', 'r', newline='') as f:
+        # fieldnames = ['level','p','evals','lift_labels', 'lift_evs']
+        reader = csv.DictReader(f, delimiter=';')
+        for r in reader:
+            lvl = ideal_from_label(K, r['level'])
+            modp_evs.append(HeckeEig(eval(r['evals']), lvl, ZZ(r['p'])))
+    return modp_evs
 
 def find_magma_lifts(d):
     """
     Use magma to look for lifts which are not in the LMFDB
     """
-    modp_evs = [ev for ev in find_congruent_forms(d) if not ev.has_rational_lift()]
-    
+    # modp_evs = [ev for ev in find_congruent_forms(d) if not ev.has_rational_lift()]
+    modp_evs = load_unliftable_from_csv(d)
+    magma.attach_spec("../../spec")
+    magma.load("../look_for_lifts.m")
+    for h in modp_evs:
+        print(h.p(), h.LR_primes())
+        # magma.eval(f"f := LoadForm({d}, {h.p()}, \"{h.level_label()}\", {h.eigenvalues()});")
+        # magma.eval("print f;")
+        # magma.eval(f"FindLifts(f);")
+        
+        
     

@@ -19,9 +19,9 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 100)
 	    if ev ne 0 and ev ne EigenvalueList(f)[i] then 
 		break;
 	    end if;
-	    form := f;
-	    break;
 	end for;
+	form := f;
+	break;
     end for;
     
     if Type(form) eq Type(0) then
@@ -29,13 +29,17 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 100)
     else
 	return form;
     end if;
-    
 end function;
 
 
 function FindLifts(f : lvlBd := 100)
     // LR_nums := LevelRaiseFactors(f, lvlBd);
     LR_nums := LevelRaisingPrimes(f);
+    if #LR_nums eq 0 then
+	print "No level raising primes available";
+	return 0;
+    end if;
+    
     B := Parent(f);
     level1 := Level(B);
     NormBd := GetHeckeBound(B);
@@ -43,39 +47,56 @@ function FindLifts(f : lvlBd := 100)
     ZK := Integers(K);
     Wp := Weight(B);
     W0 := BianchiWeight(K, 0,0);
+    p := Characteristic(B);
 
     // TODO: also look for primes dividing level!
     for I in [I : I in LR_nums | IsCoprime(Level(B), I)] do
 	printf "Looking for lifts of level %o \n", LMFDBLabel(I);
 	level2 := I*level1;
 
-	B0 := BianchiCohomologySpace(level2, W0);
+	// B0 := BianchiCohomologySpace(level2, W0);
 	Bp := BianchiCohomologySpace(level2, Wp);
-	red_map := ReductionModPMap(B0,Bp);
-	reduction := [Bp`down(red_map((Inverse(B0`down)(B0`forms.i)))) : i in [1..Dimension(B0`forms)]];
-	oldspace := DegenerateSubspace(f,Bp);
-        inter := sub<Bp`forms | reduction> meet oldspace;
+	// red_map := ReductionModPMap(B0,Bp);
+	// reduction := [Bp`down(red_map((Inverse(B0`down)(B0`forms.i)))) : i in [1..Dimension(B0`forms)]];
+	// oldspace := DegenerateSubspace(f, Bp);
+        // inter := sub<Bp`forms | reduction> meet oldspace;
 
-	if Dimension(inter) gt 0 then
-	    printf "Found characteristic zero lift of level %o\n", LMFDBLabel(level2);
-	    print "Computing builtin Hecke eigenforms";
+	// if Dimension(inter) gt 0 then
+	print "Found intersection of oldspace and reduction mod p in level", LMFDBLabel(level2);
+	print "Computing builtin Hecke eigenforms";
 
-	    C := BianchiCuspForms(K,level2);
-	    for f in NewformDecomposition(NewSubspace(C)) do
-		primes := GoodHeckePrimes(Bp, NormBd);
-		char0_evals := [HeckeEigenvalue(Eigenform(f), pp) : pp in primes];
-		E := Parent(char0_evals[1]);
-		print "Eigenvalues of char 0 lift lie in", E, "of discriminant", Discriminant(Integers(E));
-		p_primes := [m[1] : m in Factorization(p*Integers(E))];
-		for pp in Factorization(p*Integers(E)) do
-		    _,phi := ResidueClassField(pp[1]);
-		    print [phi(app) : app in char0_evals];
+	C := BianchiCuspForms(K, level2);
+	for j -> F in NewformDecomposition(NewSubspace(C)) do
+	    print "Testing eigenform", j;
+	    wrong_ctr := 0;
+	    is_wrong := false;
+	    primes := GoodHeckePrimes(Bp, NormBd);
+	    E := Parent(HeckeEigenvalue(Eigenform(F), primes[1]));
+	    print "Eigenvalues of char 0 lift lie in", E, "of discriminant", Discriminant(Integers(E));
+	    p_primes := [m[1] : m in Factorization(p*Integers(E))];
+	    for pp in Factorization(p*Integers(E)) do
+		_, phi := ResidueClassField(pp[1]);
+		for qq in primes do 
+		    if Eigenvalue(f,qq) ne phi(HeckeEigenvalue(Eigenform(F), qq)) then
+			// this is not the right one, move on to another level raising prime
+			// but allow a couple of mismatches just in case
+			wrong_ctr +:= 1;
+			if wrong_ctr gt 2 then
+			    is_wrong := true;
+			    break;
+			end if;
+		    end if;
+		    printf "%o \t %o \t %o\n", LMFDBLabel(qq), phi(HeckeEigenvalue(Eigenform(F), qq)), Eigenvalue(f,qq);
 		end for;
-		print "";
+		if not is_wrong then 
+		    print "Found correct form!";
+		    return F;
+		end if;
 	    end for;
-	    print "---\n";
-	    // return inter;
-	end if;
+	end for;
+	print "---\n";
+	// return inter;
+	// end if;
 
     end for;
     return "None found";
