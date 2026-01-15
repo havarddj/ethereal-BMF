@@ -281,6 +281,22 @@ def load_unliftable_from_csv(d):
             modp_evs.append(HeckeEig(eval(r['evals']), lvl, ZZ(r['p'])))
     return modp_evs
 
+def load_liftable_from_csv(d):
+    K = QuadFld(d)
+    modp_evs = []
+    with open(f'd{d}_liftable.csv', 'r', newline='') as f:
+        # fieldnames = ['level','p','evals','lift_labels', 'lift_evs']
+        reader = csv.DictReader(f, delimiter=';')
+        for r in reader:
+            lvl = ideal_from_label(K, r['level'])
+            h = HeckeEig(eval(r['evals']), lvl, ZZ(r['p']))
+            for lift in eval(r['lift_labels']):
+                h.add_rational_lift(lift)
+            modp_evs.append(h)
+            
+    return modp_evs
+
+
 def ul_find_magma_lifts(d):
     """
     Use magma to look for lifts which are not in the LMFDB
@@ -301,15 +317,26 @@ def ul_find_magma_lifts(d):
         print(lift)
         h.irrational_lifts.append(lift)
     return modp_evs
-    
+
 
 def ul_print_LR_primes(d):
     F = QuadFld(d)
     # modp_evs = [ev for ev in find_congruent_forms(d) if not ev.has_rational_lift()]
     modp_evs = load_unliftable_from_csv(d)
     modp_evs = [h for h in modp_evs if h.LR_primes()]
-
+    
     for h in modp_evs:
         print(h.level_label(),h.p(),h.LR_primes())
+
+def print_lifts(d):
+    modp_evs = load_liftable_from_csv(d)
+    F = QuadFld(d)
+    for h in modp_evs:
+        # for lab in h.get_rational_lifts():
+        #     print(lab)
+        lift_levels = [level_from_BMF_label(F, lab) for lab in h.get_rational_lifts()]
+        print(f"Mod {h.p()} eigenform of lvl {h.level_label()} has lifts from raising level at ideals", *[ideal_label(lvl/h.level()) for lvl in lift_levels])
         
+def level_from_BMF_label(F, label):
+    return ideal_from_label(F, label.split('-')[1])
     
