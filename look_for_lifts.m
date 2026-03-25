@@ -63,7 +63,7 @@ function FindLifts(f : lvlBd := 100)
 
 	// if Dimension(inter) gt 0 then
 	    // print "Found intersection of oldspace and reduction mod p in level", LMFDBLabel(level2);
-	print "Computing builtin Hecke eigenforms";
+	vprint User1: "Computing builtin Hecke eigenforms";
 
 	C := BianchiCuspForms(K, level2);
 	for j -> F in NewformDecomposition(NewSubspace(C)) do
