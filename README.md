@@ -6,4 +6,7 @@ This directory contains computations relevant for the paper [CoD-J26].
 - In [builtin_utils.m](./builtin_utils.m) there are a couple of helper functions for computing and printing mod $p$ reductions of eigenvalues coming from the builtin Magma methods.
 - In [write_forms.m](./write_forms.m) there's code for batch computing ethereal Bianchi classes.
 - The directory [data](./data/) contains data computed using these methods.
-- the directory [sage](./sage/) contains sage code for comparing eigenvalue systems with data from the LMFDB.
+- The directory [sage](./sage/) contains sage code for comparing eigenvalue systems with data from the LMFDB.
+
+
+Note that we need to be a little careful with labeling ideals between Sage and Magma. In both cases, this is achieved by choosing minimal polynomials of imaginary quadratic fields as in LMFDB; the relevant functions are `QuadFld` which takes _a positive integer d_ and returns the field $\mathbb{Q}(\sqrt{-d})$ with the correct generator. Then the labels (magma: `LMFDBLabel(I)`, sage: `ideal_label(I)` from [psort.py](./sage/psort.py)) are computed correctly.
