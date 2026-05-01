@@ -250,8 +250,10 @@ def test(d, find_all_lifts=False):
     print(*(x for x in modp_evs if not x.has_rational_lift()), sep='\n')
     return modp_evs
 
-def test_write(d):
-    modp_evs = find_congruent_forms(d, find_all_lifts=true)
+def test_write(d, modp_evs = None):
+    if modp_evs is None: 
+        modp_evs = find_congruent_forms(d, find_all_lifts=true)
+
     with open(f'd{d}_liftable.csv', 'w', newline='') as f:
         fieldnames = ['level','p','evals','lift_labels']
         writer = csv.DictWriter(f, delimiter=';', fieldnames=fieldnames)

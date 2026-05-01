@@ -27,21 +27,72 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 	wt1 := BianchiWeight(F, 0, 0);
 	B1 := BianchiCohomologySpace(level,wt1);
 	for p in L[2] do
-	    try 
+	    // try 
 		wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
 		B2 := BianchiCohomologySpace(level,wt2);
 		SetHeckeBound(B2, heckeBd);
 		BG := GenuineSubspace(B1,B2);
+		print BG;
 		for f in Eigenforms(B2) do
-		    if not IsEisenstein(f) and f in BG and f`eigenspaceDim eq 1 then
+		    if not IsEisenstein(f) and f in ChangeRing(BG,BaseRing(f)) and f`eigenspaceDim eq 1 then
 			WriteClass(f, filename : labels := labels);
 			print "Wrote class to file!";
 		    end if;
 		end for;
-	    catch err;
-		fprintf filename, "%o; %o; ERROR\n", LMFDBLabel(level), p;
-	    end try;
+	    // catch err;
+	    // 	fprintf filename, "%o; %o; ERROR\n", LMFDBLabel(level), p;
+	    // end try;
 	end for;
+    end for;
+    return "";
+end function;
+
+/*
+Recompute non-liftable forms (useful after changing formatting)
+and append them to the end of the file
+
+So we have to order them manually, or using this bash command (on unix systems):
+
+`sort -k1 -n -t; filename`
+(-k1 sorts by first col, -n is numerical and -t; sets delimiter)
+
+The condition for recomputing is set manually in the function,
+see the comment labeled "(*)". 
+*/
+function RecomputeIrrational(d : heckeBd := 100)
+    F := QuadFld(d);
+    filename := "data/nonEis_d" cat Sprint(d) cat ".csv";
+    lines := Split(Read(filename), "\n");
+    header := Split(lines[1], ";");
+    primeLabels := header[3..#header];
+    primeList := [LMFDBIdeal(F,label) : label in primeLabels];
+    for line in lines[2..#lines] do
+	entries := Split(line, ";");
+
+	// (*) current miscomputed ones:
+	if not exists{e : e in entries[3..#entries-1] | "w" in e or "x" in e} then
+	    continue;
+	end if;
+	level := LMFDBIdeal(F, entries[1]);
+	p := StringToInteger(entries[2]);
+
+	wt1 := BianchiWeight(F, 0, 0);
+	B1 := BianchiCohomologySpace(level,wt1);
+	    // try 
+		wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
+		B2 := BianchiCohomologySpace(level,wt2);
+		SetHeckeBound(B2, heckeBd);
+		BG := GenuineSubspace(B1,B2);
+		print BG;
+		for f in Eigenforms(B2) do
+		    if not IsEisenstein(f) and f in ChangeRing(BG,BaseRing(f)) and f`eigenspaceDim eq 1 then
+			WriteClass(f, filename : labels := primeLabels);
+			print "Wrote class to file!";
+		    end if;
+		end for;
+	    // catch err;
+	    // 	fprintf filename, "%o; %o; ERROR\n", LMFDBLabel(level), p;
+	    // end try;
     end for;
     return "";
 end function;
