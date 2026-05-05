@@ -53,9 +53,14 @@ and append them to the end of the file
 
 So we have to order them manually, or using this bash command (on unix systems):
 
-`sort -k1 -n -t; filename`
-(-k1 sorts by first col, -n is numerical and -t; sets delimiter)
+`sort -k1 -n -t; -u -o filename filename`
+(here:
+-k1 sorts by first col,
+-n is numerical,
+-t; sets delimiter,
+-o filename sets output file (and the second filename specifies input file))
 
+(It might be helpful to sort in-place: perl -i -ne 'print if ! $x{$_}++' filename)
 The condition for recomputing is set manually in the function,
 see the comment labeled "(*)". 
 */
@@ -66,15 +71,19 @@ function RecomputeIrrational(d : heckeBd := 100)
     header := Split(lines[1], ";");
     primeLabels := header[3..#header];
     primeList := [LMFDBIdeal(F,label) : label in primeLabels];
+    recomputedPairs := [];
     for line in lines[2..#lines] do
 	entries := Split(line, ";");
-
 	// (*) current miscomputed ones:
 	if not exists{e : e in entries[3..#entries-1] | "w" in e or "x" in e} then
 	    continue;
 	end if;
 	level := LMFDBIdeal(F, entries[1]);
 	p := StringToInteger(entries[2]);
+	if [*level,p*] in recomputedPairs then
+	    continue;
+	end if;
+	Append(~recomputedPairs,[*level,p*]);
 
 	wt1 := BianchiWeight(F, 0, 0);
 	B1 := BianchiCohomologySpace(level,wt1);

@@ -1,5 +1,6 @@
 function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
     // Helper function to load form from value of d, p, the level label, and eigenvalues evals
+    // WARNING: this recomputes eigenforms, so it's expensive - it's better to use something else
     F := QuadFld(d);
     lvl := LMFDBIdeal(F, lvl_label);
     W := BianchiWeight(F, 0,0 : char := p);
@@ -141,4 +142,36 @@ end function;
 
 function FindIrrationalLifts(f)
     LRPrimes := LevelRaisingPrimes(f);
+end function;
+
+/*
+Helper function to load rational lifts.
+
+*/
+function LoadAllLifts(d : startBd := 0, stopBd := 1000)
+    F := QuadFld(d);
+    filename := "data/nonEis_d" cat Sprint(d) cat ".csv";
+    lines := Split(Read(filename), "\n");
+    header := Split(lines[1], ";");
+    primeLabels := header[3..#header];
+    primeList := [LMFDBIdeal(F,label) : label in primeLabels];
+    forms := [* *];
+    for i -> line in lines[2..#lines] do
+	if i le startBd or i gt stopBd then continue; end if;
+
+	entries := Split(line, ";");
+	if "x" in entries[#entries] or "[" in entries[3] then
+	    continue;
+	end if;
+
+	lvl := LMFDBIdeal(F, entries[1]);
+	p := StringToInteger(entries[2]);
+	if p in [2,3] then continue; end if;
+
+	B := BianchiCohomologySpace(lvl, BianchiWeight(F,0,0 : char :=p));
+	f := ReadClass(line,B, primeList);
+	Append(~forms,f);
+    end for;
+    return forms;
+    
 end function;
