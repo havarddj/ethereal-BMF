@@ -25,13 +25,13 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 	    continue;
 	end if;
 	wt1 := BianchiWeight(F, 0, 0);
-	B1 := BianchiCohomologySpace(level,wt1);
+	B1 := BianchiCohomologySpace(level, wt1);
 	for p in L[2] do
 	    // try 
 		wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
 		B2 := BianchiCohomologySpace(level,wt2);
 		SetHeckeBound(B2, heckeBd);
-		BG := GenuineSubspace(B1,B2);
+		BG := EtherealSubspace(B1,B2);
 		print BG;
 		for f in Eigenforms(B2) do
 		    if not IsEisenstein(f) and f in ChangeRing(BG,BaseRing(f)) and f`eigenspaceDim eq 1 then
@@ -64,7 +64,7 @@ So we have to order them manually, or using this bash command (on unix systems):
 The condition for recomputing is set manually in the function,
 see the comment labeled "(*)". 
 */
-function RecomputeIrrational(d : heckeBd := 100)
+function RecomputeIrrational(d : heckeBd := 100, lvlLowerBd := 0, lvlUpperBd := 100000)
     F := QuadFld(d);
     filename := "data/nonEis_d" cat Sprint(d) cat ".csv";
     lines := Split(Read(filename), "\n");
@@ -79,11 +79,17 @@ function RecomputeIrrational(d : heckeBd := 100)
 	    continue;
 	end if;
 	level := LMFDBIdeal(F, entries[1]);
+	if Norm(level) lt lvlLowerBd or Norm(level) gt lvlUpperBd then
+	    continue;
+	end if;
+	print line;
 	p := StringToInteger(entries[2]);
+
+	// Keep track of levels and primes computed so we don't double count Hecke conjugates
 	if [*level,p*] in recomputedPairs then
 	    continue;
 	end if;
-	Append(~recomputedPairs,[*level,p*]);
+	Append(~recomputedPairs, [*level,p*]);
 
 	wt1 := BianchiWeight(F, 0, 0);
 	B1 := BianchiCohomologySpace(level,wt1);
@@ -91,9 +97,12 @@ function RecomputeIrrational(d : heckeBd := 100)
 		wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
 		B2 := BianchiCohomologySpace(level,wt2);
 		SetHeckeBound(B2, heckeBd);
-		BG := GenuineSubspace(B1,B2);
+		BG := EtherealSubspace(B1,B2);
 		print BG;
 		for f in Eigenforms(B2) do
+		    if f`eigenspaceDim gt 1 then
+			print "Found eigenspace of dimension", f`eigenspaceDim;
+		    end if;
 		    if not IsEisenstein(f) and f in ChangeRing(BG,BaseRing(f)) and f`eigenspaceDim eq 1 then
 			WriteClass(f, filename : labels := primeLabels);
 			print "Wrote class to file!";
@@ -105,3 +114,58 @@ function RecomputeIrrational(d : heckeBd := 100)
     end for;
     return "";
 end function;
+
+
+// Look for instances of ethereal spaces where the level raise at p has increased multiplicity
+function LookForMultiplicity(d : heckeBd := 100, levelUpperBd := 1000, levelLowerBd := 0)
+    print "Computing H_1 to find ethereal characteristics.";
+    levels_and_primes := ComputeLevelsAndPrimes(d : lowerBound:= levelLowerBd, upperBound := levelUpperBd);
+    print "Finished computing ethereal characteristics.";
+    
+    F := QuadFld(d);
+    ZF := MaximalOrder(F);
+
+    labels := [LMFDBLabel(pp) : pp in SortByLMFDBLabel(PrimesUpTo(heckeBd, F)) ];
+
+    for L in levels_and_primes do
+	level := (ZF!L[1])*ZF;
+	B0 := BianchiCohomologySpace(level, [0,0]);
+	for p in L[2] do
+	    if p notin [3,5] or not IsCoprime(level, p*ZF) then
+		continue;
+	    end if;
+	    Wp := BianchiWeight(F, 0, 0 : char := Integers()!p);
+	    Bp := BianchiCohomologySpace(level, Wp);
+	    SetHeckeBound(Bp, heckeBd);
+	    BEth := EtherealSubspace(B0, Bp);
+	    print "Ethereal subspace:", BEth;
+	    for f in Eigenforms(Bp) do
+		try 
+		    if f in ChangeRing(BEth, BaseRing(f)) and IsCoprime(p*Integers(F), Level(f)) then
+			BLevelRaise := BianchiCohomologySpace(level*p, Wp);
+			SetHeckeBound(BLevelRaise, heckeBd);
+			if Dimension(BLevelRaise) in [1, Dimension(Bp)] then
+			    continue;
+			end if;
+			    
+			print "Computing eigenforms with p in the level; dimension is", Dimension(BLevelRaise);
+
+			for g in Eigenforms(BLevelRaise) do
+			    flag := g`eigenspaceDim gt 1;
+			    flag and:= forall{1 : pp in GoodHeckePrimes(BLevelRaise, heckeBd) | Eigenvalue(g,pp) eq Eigenvalue(f,pp)};
+			    if flag then
+				printf "Located multiplicity %o space of level %o mod %o\n", g`eigenspaceDim, LMFDBLabel(Level(g)), p;
+				return g;
+			    end if;
+			end for;
+		    end if;
+		catch err
+		    print "Failed with error", err;
+		    print f;
+		end try;
+	    end for;
+	end for;
+    end for;
+    return "";
+end function;
+
