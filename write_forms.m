@@ -53,11 +53,11 @@ and append them to the end of the file
 
 So we have to order them manually, or using this bash command (on unix systems):
 
-`sort -k1 -n -t; -u -o filename filename`
+`sort -k1 -n -t";" -o filename filename`
 (here:
 -k1 sorts by first col,
 -n is numerical,
--t; sets delimiter,
+-t";" sets delimiter,
 -o filename sets output file (and the second filename specifies input file))
 
 (It might be helpful to sort in-place: perl -i -ne 'print if ! $x{$_}++' filename)

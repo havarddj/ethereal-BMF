@@ -330,6 +330,27 @@ def ul_print_LR_primes(d):
     for h in modp_evs:
         print(h.level_label(),h.p(),h.LR_primes())
 
+def look_for_mult_liftable(d):
+    """
+    Use magma to look for higher multiplicity in lifted space
+    """
+    F = QuadFld(d)
+    modp_evs = load_liftable_from_csv(d)
+    magma.attach_spec("../../spec")
+    magma.load("../check_mult_2.m")
+
+    for h in modp_evs:
+        # TODO: change this to look for all
+        lift_lvl = level_from_BMF_label(F, h.get_rational_lifts()[0])
+        lift_lvl_label = ideal_label(lift_lvl)
+        if lift_lvl.norm() > 1000:
+            print(f"Lift level {lift_lvl_label} too big, skipping")
+            continue
+        # lift = h['']
+        print(f"Looking for multiplicity >1 in lvl {lift_lvl_label} lifting {h.level_label()}")
+        print(magma.eval(f"CheckHighMult({d}, \"{h.level_label()}\", {h.p()}, \"{lift_lvl_label}\");"))
+    
+        
 def print_lifts(d):
     modp_evs = load_liftable_from_csv(d)
     F = QuadFld(d)
