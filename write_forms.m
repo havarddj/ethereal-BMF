@@ -27,7 +27,7 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 	wt1 := BianchiWeight(F, 0, 0);
 	B1 := BianchiCohomologySpace(level, wt1);
 	for p in L[2] do
-	    // try 
+	    try 
 		wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
 		B2 := BianchiCohomologySpace(level,wt2);
 		SetHeckeBound(B2, heckeBd);
@@ -39,9 +39,10 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 			print "Wrote class to file!";
 		    end if;
 		end for;
-	    // catch err;
-	    // 	fprintf filename, "%o; %o; ERROR\n", LMFDBLabel(level), p;
-	    // end try;
+	    catch err;
+		print "error:", err;
+		fprintf filename, "%o; %o; ERROR\n", LMFDBLabel(level), p;
+	    end try;
 	end for;
     end for;
     return "";
@@ -87,30 +88,35 @@ function RecomputeIrrational(d : heckeBd := 100, lvlLowerBd := 0, lvlUpperBd := 
 
 	// Keep track of levels and primes computed so we don't double count Hecke conjugates
 	if [*level,p*] in recomputedPairs then
+	    print "Already computed lifts for this system";
 	    continue;
 	end if;
 	Append(~recomputedPairs, [*level,p*]);
 
 	wt1 := BianchiWeight(F, 0, 0);
 	B1 := BianchiCohomologySpace(level,wt1);
-	    // try 
+	    try 
 		wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
 		B2 := BianchiCohomologySpace(level,wt2);
 		SetHeckeBound(B2, heckeBd);
+		print "Computing ethereal subspace";
+	
 		BG := EtherealSubspace(B1,B2);
 		print BG;
 		for f in Eigenforms(B2) do
+		    
 		    if f`eigenspaceDim gt 1 then
 			print "Found eigenspace of dimension", f`eigenspaceDim;
 		    end if;
-		    if not IsEisenstein(f) and f in ChangeRing(BG,BaseRing(f)) and f`eigenspaceDim eq 1 then
+		    if not IsEisenstein(f) and f in ChangeRing(BG, BaseRing(f)) and f`eigenspaceDim eq 1 then
 			WriteClass(f, filename : labels := primeLabels);
 			print "Wrote class to file!";
 		    end if;
 		end for;
-	    // catch err;
-	    // 	fprintf filename, "%o; %o; ERROR\n", LMFDBLabel(level), p;
-	    // end try;
+	    catch err;
+		print "error computing forms:", err;
+		fprintf filename, "%o; %o; ERROR\n", LMFDBLabel(level), p;
+	    end try;
     end for;
     return "";
 end function;

@@ -41,6 +41,8 @@ function FindLifts(f : lvlBd := 100 , at_p := false)
     if #LR_nums eq 0 then
 	print "No level raising primes available";
 	return 0;
+    else
+	print "Level raise factors are", LR_nums;
     end if;
     
     B := Parent(f);
@@ -83,12 +85,20 @@ function FindLifts(f : lvlBd := 100 , at_p := false)
 	primes := [qq : qq in primes | IsCoprime(qq,level2)];
 	
 	C := BianchiCuspForms(K, level2);
+	if Dimension(C) eq 0 then
+	    print "Characteristic 0 space empty";
+	end if;
+	
 	for j -> F in NewformDecomposition(NewSubspace(C)) do
 	    print "Testing eigenform", j;
-	    wrong_ctr := 0;
-	    is_wrong := false;
 	    // Compute first Hecke eigenvalue to find field
-	    E<z> := Parent(HeckeEigenvalue(Eigenform(F), primes[1]));
+	    E := Parent(HeckeEigenvalue(Eigenform(F), primes[1]));
+	    if Degree(E) gt 1 then
+		E<z> := Parent(HeckeEigenvalue(Eigenform(F), primes[1]));
+	    else
+		z := Rationals()!1;
+	    end if;
+	    
 	    if Degree(E) lt Degree(K) then continue; end if;
 	    
 	    print "Eigenvalues of char 0 lift lie in", E, "of discriminant", Discriminant(Integers(E));
@@ -103,7 +113,7 @@ function FindLifts(f : lvlBd := 100 , at_p := false)
 		    print "Looking at reduction modulo non-principal ideal above", p;
 		end if;
 		
-		// Get better representation:
+		// Get better presentation of finite field than the default one:
 		if Degree(Emodp_bad) gt 1 then
 		    Fpx := PolynomialRing(GF(p));
 		    if not exists(EmodpPol){ fac[1] : fac in Factorization(Fpx!MinimalPolynomial(z)) | Degree(fac[1]) eq Degree(Emodp_bad)} then
@@ -123,17 +133,13 @@ function FindLifts(f : lvlBd := 100 , at_p := false)
 
 		if Degree(Emodp) eq Degree(HeckeField) then
 		    // this is chosen at random goddammit
-		    flag, iso := IsIsomorphic(HeckeField, Emodp);
+		    flag, emb := IsIsomorphic(HeckeField, Emodp);
 		    assert flag;
 		    _, auts, _ := AutomorphismGroup(Emodp);
 		elif Degree(Emodp) mod Degree(HeckeField) eq 0 then
 		    Embed(HeckeField, Emodp);
-		    iso := hom<HeckeField -> Emodp | x :-> Emodp!x>;
+		    emb := hom<HeckeField -> Emodp | x :-> Emodp!x>;
 		    _, auts, _ := AutomorphismGroup(Emodp);
-		    // _, auts, _ := AutomorphismGroup(HeckeField);
-		    
-		    // // TODO: change name of this since it's no longer iso
-		    // auts := [hom<Emodp -> Emodp | x :-> x> : sigma in ];
 		else
 		    print "Wrong residue degree of prime";
 		    continue;
@@ -141,8 +147,10 @@ function FindLifts(f : lvlBd := 100 , at_p := false)
 		
 		// Need to loop over automorphisms because iso is chosen at random
 		for aut_no -> aut in auts do
+		    wrong_ctr := 0;
+		    is_wrong := false;
 		    print "Testing automorphism", aut_no;
-		    i := iso*aut;
+		    i := emb*aut;
 		    for qq in primes do
 			_, qq_gen := IsPrincipal(qq);
 			
@@ -277,9 +285,11 @@ function CanKillLiftingObstr(p, I,J)
     end if;
 end function;
 
-function CheckNonrationalLift(d, line, primeList: extended := false)
+function CheckNonrationalLift(d, line, topLine: extended := false)
     F := QuadFld(d);
     lvl := Split(line, ";")[1];
+    topList := Split(topLine, ";");
+    primeList := topList[3..#topList];
     p := StringToInteger(Split(line, ";")[2]);
     B := BianchiCohomologySpace(LMFDBIdeal(F, lvl), BianchiWeight(F,0,0 : char := p));
     print "Initializing class from line";
@@ -302,16 +312,17 @@ end function;
 
 function CheckNR1()
     line := "281.2;5;[ 2, 1 ];[ 2, 3 ];[ 2, 2 ];[ 2, 1 ];[ 2, 0 ];[ 1, 0 ];[ 3, 1 ];[ 4, 3 ];0;[ 4, 1 ];[ 0, 2 ];[ 0, 0 ];[ 3, 0 ];[ 2, 0 ];[ 0, 1 ];[ 3, 3 ];[ 4, 2 ];[ 0, 1 ];[ 0, 3 ];[ 4, 3 ];[ 0, 1 ];[ 1, 3 ];[ 1, 0 ];x^2 + 4*x + 2";
-    primeList := Split("2.1;2.2;7.1;9.1;11.1;11.2;23.1;23.2;25.1;29.1;29.2;37.1;37.2;43.1;43.2;53.1;53.2;67.1;67.2;71.1;71.2;79.1;79.2",";");
-    return CheckNonrationalLift(7, line,primeList : extended := true);
+    topLine := "level;p;2.1;2.2;7.1;9.1;11.1;11.2;23.1;23.2;25.1;29.1;29.2;37.1;37.2;43.1;43.2;53.1;53.2;67.1;67.2;71.1;71.2;79.1;79.2";
+
+    return CheckNonrationalLift(7, line, topLine : extended := true);
 end function;
     
 // Check that ethereal form with Fp^2 coefficients lifts to a form when adding 5.1 to the level.
 function CheckNonrationalLiftFp2()
     line := "293.1;3;[ 1, 1 ];[ 2, 0 ];[ 0, 0 ];0;[ 2, 1 ];[ 2, 1 ];[ 0, 2 ];[ 2, 1 ];[ 0, 1 ];[ 2, 2 ];[ 1, 1 ];[ 0, 1 ];[ 2, 0 ];[ 2, 1 ];[ 0, 2 ];[ 0, 1 ];[ 1, 0 ];[2, 0 ];[ 2, 2 ];[ 0, 0 ];[ 0, 0 ];[ 0, 2 ];[ 2, 2 ];[ 1, 2 ];[ 2, 2 ];x^2 + 1";
-    primeList := Split("2.1;5.1;5.2;9.1;13.1;13.2;17.1;17.2;29.1;29.2;37.1;37.2;41.1;41.2;49.1;53.1;53.2;61.1;61.2;73.1;73.2;89.1;89.2;97.1;97.2", ";");
+    primeList := "level;p;2.1;5.1;5.2;9.1;13.1;13.2;17.1;17.2;29.1;29.2;37.1;37.2;41.1;41.2;49.1;53.1;53.2;61.1;61.2;73.1;73.2;89.1;89.2;97.1;97.2";
     
-    return FindLifts(1, line, primeList);
+    return CheckNonrationalLift(1, line, primeList);
 end function;
 
 function CheckAnotherNonrationalLiftFp2()
@@ -327,16 +338,10 @@ function CheckAnotherNonrationalLiftFp2()
 end function;
 
 function CheckCubicNonrationalLift()
-    F := QuadFld(11);
-    // NB: the eigenform detector doesn't find the eigensystem, so we recompute it by hand.
-    p := 3;
     lvl := "265.1";
-    B := BianchiCohomologySpace(LMFDBIdeal(F, lvl), BianchiWeight(F,0,0 : char := p));
-    SetHeckeBound(B, 150);
-    printf "Computing eigenforms mod 3 of level 265.1 (dim = %o)\n", Dimension(B);
-    efs := Eigenforms(B);
-    print "Done computing eigenforms; looking for individual lifts";
-    return FindLifts(efs[1]);
+    line := "283.1;2;0;[ 1, 0, 1 ];[ 1, 1, 1 ];[ 1, 1, 1 ];[ 0, 0, 0 ];[ 1, 0, 1 ];[ 0, 0, 0 ];[ 1, 1, 0 ];[ 1, 1, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 1, 0, 1 ];[ 1, 1, 0 ];[ 0, 0, 0 ];[ 1, 0, 1 ];[ 0, 0, 0 ];[ 1, 1, 0 ];[ 1, 0, 1 ];[ 1, 1, 0 ];[ 1, 1, 1 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];x^3 + x + 1";
+    topLine := "level;p;2.1;3.1;3.2;11.1;11.2;17.1;17.2;19.1;19.2;25.1;41.1;41.2;43.1;43.2;49.1;59.1;59.2;67.1;67.2;73.1;73.2;83.1;83.2";
+    return CheckNonrationalLift(2, line, topLine);
 end function;
 
 // function CheckNonRationalLift5()
@@ -372,3 +377,32 @@ function CheckLiftableD2()
     return FindLifts(f : lvlBd := 200);
 end function;
 
+// Look for lifts which sage couldn't find in the lmfdb
+function LookForLMFDBUnliftable(d)
+    filename := "data/lmfdbNonLift_d" cat Sprint(d) cat ".csv";
+    lines := Split(Read(filename), "\n");
+    topLine := lines[1];
+    results := [* *];
+    for line in lines[2..#lines] do
+	print "Looking for lifts of line", line;
+	lift := CheckNonrationalLift(d, line, topLine);
+	Append(~results, <line,lift>);
+    end for;
+    return results;
+end function;
+
+
+function CheckNonLR()
+    d := 1;
+    F := QuadFld(d);
+    p := 23;
+    bound := 200;
+    B := BianchiCohomologySpace(LMFDBIdeal(F, "281.1"), BianchiWeight(F,0,0 : char := p));
+    SetHeckeBound(B, bound);
+    print "Computing eigenforms with Hecke bound", bound;
+    lifts := [* *];
+    for f in Eigenforms(B) do
+	Append(~lifts, <f, FindLifts(f : lvlBd := bound, at_p := true)>);
+    end for;
+    return lifts;
+end function;

@@ -165,13 +165,14 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
     # this is small enough that it doesn't make sense to use an iterator. 
 
     modp_evs = []
-    with open(input_file, newline='') as f:
+    with open(input_file) as f:
         csv_reader = csv.reader(f, delimiter=';')
 
         prime_labels = next(csv_reader)[2:]
             
         for row in csv_reader:
-            
+            if row == []:
+                continue
             lvl = ideal_from_label(K, row[0])
             p = eval(row[1])
             ev = []
@@ -298,28 +299,33 @@ def load_liftable_from_csv(d):
             
     return modp_evs
 
-
-def ul_find_magma_lifts(d):
+def ul_filter_csv(d):
     """
-    Use magma to look for lifts which are not in the LMFDB
+    Create magma-readable file with EBMFs which don't lift in the lmfdb
     """
     F = QuadFld(d)
-    # modp_evs = [ev for ev in find_congruent_forms(d) if not ev.has_rational_lift()]
+    input_file = f"../data/nonEis_d{d}.csv"
+    output_file = f"../data/lmfdbNonlift_d{d}.csv"
+    with open(input_file, newline='') as f:
+        csv_reader = csv.reader(f, delimiter=';')
+        
     modp_evs = load_unliftable_from_csv(d)
-    modp_evs = [h for h in modp_evs if h.LR_primes()]
-    # sort in order to
-    modp_evs.sort(key= lambda h: prime_from_label(F,h.LR_primes()[0]).norm())
-    magma.attach_spec("../../spec")
-    magma.load("../look_for_lifts.m")
-    for h in modp_evs:
-        print("Looking for lifts of", h, "with level raising primes", h.LR_primes())
-        magma.eval(f"f := LoadForm({d}, {h.p()}, \"{h.level_label()}\", {h.eigenvalues()});")
-        magma.eval("print f;")
-        lift = magma.eval(f"FindLifts(f);")
-        print(lift)
-        h.irrational_lifts.append(lift)
-    return modp_evs
-
+    modp_evs = [h for h in modp_evs]
+    lines = []
+    with open(input_file, newline='') as f:
+        csv_reader = csv.reader(f, delimiter=';')
+        # add top line
+        lines.append(";".join(next(csv_reader)))
+        for row in csv_reader:
+            if row == [] or any(['x' in r for r in row]):
+                continue
+            p = eval(row[1])
+            if any([row[0] == h.level_label() and p == h.p() for h in modp_evs]):
+                lines.append(";".join(row))
+        
+    with open(output_file, "w") as f:
+        f.write("\n".join(lines))
+    
 
 def ul_print_LR_primes(d):
     F = QuadFld(d)
