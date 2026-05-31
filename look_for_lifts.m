@@ -73,7 +73,7 @@ function FindLifts(f : lvlBd := 100 , at_p := false, includeLvl := false)
 
     // Caching is supposed to speed this up by storing oldspaces
     // see https://magma.maths.usyd.edu.au/magma/handbook/text/1784#20376
-    SetStoreModularForms(K, true);
+    // SetStoreModularForms(K, true);
     print "Factors are", [LMFDBLabel(I) : I in LR_nums];
     for I in LR_nums do
 
@@ -495,3 +495,23 @@ function CheckDouchebag2()
     return lifts;
 
 end function;
+
+function CheckDouchebag3()
+    // This one has small level so it shouldn't be that hard to find lift
+    d := 11;
+    F := QuadFld(d);
+    p := 17;
+    bound := 150;
+    B := BianchiCohomologySpace(LMFDBIdeal(F, "69.2"), BianchiWeight(F,0,0 : char := p));
+    print "Initialized", B;
+    SetHeckeBound(B, bound);
+    print "Computing eigenforms with Hecke bound", bound;
+    lifts := [* *];
+    for f in Eigenforms(B) do
+	print "Eigenvalues:", EigenvalueList(f);
+	Append(~lifts, <f, FindLifts(f : lvlBd := bound, at_p := false, includeLvl := false)>);
+    end for;
+    return lifts;
+
+end function;
+
