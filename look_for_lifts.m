@@ -38,6 +38,8 @@ end function;
 function FindLifts(f : lvlBd := 100 , at_p := false, includeLvl := false)
     // LR_nums := LevelRaiseFactors(f, lvlBd);
     LR_nums := LevelRaisingPrimes(f);
+
+
     if #LR_nums eq 0 then
 	return "No level raising primes available";
     else
@@ -55,17 +57,21 @@ function FindLifts(f : lvlBd := 100 , at_p := false, includeLvl := false)
     Wp := Weight(B);
     W0 := BianchiWeight(K, 0,0);
     p := Characteristic(B);
+    // Only check at primes above p
+    if at_p then
+	LR_nums := [];
+	for fac in Factorization(p*ZK) do
+	    Append(~LR_nums, fac[1]);
+	    Append(~LR_nums, fac[1]^2);
+	end for;
+	LR_nums := SortByLMFDBLabel(LR_nums);
+    end if;
+    
     if includeLvl then
 	Append(~LR_nums, 1*ZK);
 	LR_nums := SortByLMFDBLabel(LR_nums);
     end if;
 
-    if at_p then
-	for fac in Factorization(p*ZK) do
-	    LR_nums cat:= [r * fac[1] : r in LR_nums];
-	end for;
-	LR_nums := SortByLMFDBLabel(LR_nums);
-    end if;
     HeckeField := HeckeField(f);
     
     // TODO: also look for primes dividing level!
@@ -477,23 +483,34 @@ function CheckDouchebag()
 
 end function;
 
-function CheckDouchebag2()
+function CheckDouchebag2( : recompute:=false, bound := 100)
     // This one has small level so it shouldn't be that hard to find lift
     d := 3;
     F := QuadFld(d);
     p := 17;
-    bound := 50;
-    B := BianchiCohomologySpace(LMFDBIdeal(F, "277.1"), BianchiWeight(F,0,0 : char := p));
-    print "Initialized", B;
-    SetHeckeBound(B, bound);
-    print "Computing eigenforms with Hecke bound", bound;
-    lifts := [* *];
-    for f in Eigenforms(B) do
-	print "Eigenvalues:", EigenvalueList(f);
-	Append(~lifts, <f, FindLifts(f : lvlBd := bound, at_p := true, includeLvl := true)>);
-    end for;
-    return lifts;
+    label := "277.1";
+    B := BianchiCohomologySpace(LMFDBIdeal(F, label), BianchiWeight(F,0,0 : char := p));
+    if recompute then
+	print "Initialized", B;
+	SetHeckeBound(B, bound);
+	print "Computing eigenforms with Hecke bound", bound;
+	f := Eigenforms(B)[1];
+    else
+	filename := "data/nonEis_d" cat Sprint(d) cat ".csv";
+	lines := Split(Read(filename), "\n");
+	primeLine := Split(lines[1], ";");
+	primeList := primeLine[3..#primeLine];
+	for line in lines do
+	    if Split(line, ";")[1] eq label then
+		f := ReadClass(line, B, [LMFDBIdeal(F, I) : I in primeList]);
+		break;
+	    end if;
+	end for;
 
+    end if;
+    
+    lift := FindLifts(f : lvlBd := bound, at_p := true, includeLvl := true);
+    return lift;
 end function;
 
 function CheckDouchebag3()
