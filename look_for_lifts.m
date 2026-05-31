@@ -36,13 +36,12 @@ end function;
 
 
 function FindLifts(f : lvlBd := 100 , at_p := false)
-    LR_nums := LevelRaiseFactors(f, lvlBd);
-    // LR_nums := LevelRaisingPrimes(f);
+    // LR_nums := LevelRaiseFactors(f, lvlBd);
+    LR_nums := LevelRaisingPrimes(f);
     if #LR_nums eq 0 then
-	print "No level raising primes available";
-	return 0;
+	return "No level raising primes available";
     else
-	print "Level raise factors are", LR_nums;
+	print "Level raise factors are", [LMFDBLabel(I) : I in LR_nums];
     end if;
     
     B := Parent(f);
@@ -83,7 +82,8 @@ function FindLifts(f : lvlBd := 100 , at_p := false)
 	// end if;
 	primes := SortByLMFDBLabel(Setseq(Keys(Eigenvalues(f))));
 	primes := [qq : qq in primes | IsCoprime(qq,level2)];
-	
+	// Caching speeds this up, see https://magma.maths.usyd.edu.au/magma/handbook/text/1784#20376
+	SetStoreModularForms(K, true);
 	C := BianchiCuspForms(K, level2);
 	if Dimension(C) eq 0 then
 	    print "Characteristic 0 space empty";
@@ -338,10 +338,18 @@ function CheckAnotherNonrationalLiftFp2()
 end function;
 
 function CheckCubicNonrationalLift()
-    lvl := "265.1";
-    line := "283.1;2;0;[ 1, 0, 1 ];[ 1, 1, 1 ];[ 1, 1, 1 ];[ 0, 0, 0 ];[ 1, 0, 1 ];[ 0, 0, 0 ];[ 1, 1, 0 ];[ 1, 1, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 1, 0, 1 ];[ 1, 1, 0 ];[ 0, 0, 0 ];[ 1, 0, 1 ];[ 0, 0, 0 ];[ 1, 1, 0 ];[ 1, 0, 1 ];[ 1, 1, 0 ];[ 1, 1, 1 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];[ 0, 0, 0 ];x^3 + x + 1";
-    topLine := "level;p;2.1;3.1;3.2;11.1;11.2;17.1;17.2;19.1;19.2;25.1;41.1;41.2;43.1;43.2;49.1;59.1;59.2;67.1;67.2;73.1;73.2;83.1;83.2";
-    return CheckNonrationalLift(2, line, topLine);
+    d := 11;
+    F := QuadFld(d);
+    p := 3;
+    bound := 250;
+    B := BianchiCohomologySpace(LMFDBIdeal(F, "265.1"), BianchiWeight(F,0,0 : char := p));
+    // B := BianchiCohomologySpace(LMFDBIdeal(F, "355.1"), BianchiWeight(F,0,0 : char := p));
+    SetHeckeBound(B, bound);
+    for f in Eigenforms(B) do
+	FindLifts(f : lvlBd := bound, at_p := true);
+    end for;
+    return "cope";
+
 end function;
 
 // function CheckNonRationalLift5()
@@ -379,20 +387,53 @@ end function;
 
 // Look for lifts which sage couldn't find in the lmfdb
 function LookForLMFDBUnliftable(d)
-    filename := "data/lmfdbNonLift_d" cat Sprint(d) cat ".csv";
-    lines := Split(Read(filename), "\n");
+    input := "data/lmfdbNonLift_d" cat Sprint(d) cat ".csv";
+    output := "data/irrat_lifts_d" cat Sprint(d) cat ".csv";
+    lines := Split(Read(input), "\n");
     topLine := lines[1];
     results := [* *];
     for line in lines[2..#lines] do
 	print "Looking for lifts of line", line;
-	lift := CheckNonrationalLift(d, line, topLine);
-	Append(~results, <line,lift>);
+	res := CheckNonrationalLift(d, line, topLine);
+	id := Split(line, ";")[1] cat ";" cat Split(line, ";")[2] cat ";";
+	// if Sprint(res) eq "None found" then
+	fprintf output, id cat Sprint(res) cat "\n";
+	    // else
+	    // fprintf output, id cat Sprint(res);
+	// end if;
+	
+    end for;
+    return results;
+end function;
+
+function LookForAllIrrational(d)
+    input := "data/nonEis_d" cat Sprint(d) cat ".csv";
+    output := "data/irrat_lifts_d" cat Sprint(d) cat ".csv";
+    lines := Split(Read(input), "\n");
+    topLine := lines[1];
+    results := [* *];
+    for line in lines[2..#lines] do
+	if "[" notin line then
+	    continue;
+	end if;
+	
+	
+	print "Looking for lifts of line", line;
+	res := CheckNonrationalLift(d, line, topLine);
+	id := Split(line, ";")[1] cat ";" cat Split(line, ";")[2] cat ";";
+	// if Sprint(res) eq "None found" then
+	fprintf output, id cat Sprint(res) cat "\n";
+	    // else
+	    // fprintf output, id cat Sprint(res);
+	// end if;
+	
     end for;
     return results;
 end function;
 
 
 function CheckNonLR()
+    // This doesn't have any level raising factors, at least up to norm 200
     d := 1;
     F := QuadFld(d);
     p := 23;
