@@ -35,7 +35,7 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlBd := 100 , at_p := false)
+function FindLifts(f : lvlBd := 100 , at_p := false, includeLvl := false)
     // LR_nums := LevelRaiseFactors(f, lvlBd);
     LR_nums := LevelRaisingPrimes(f);
     if #LR_nums eq 0 then
@@ -55,15 +55,26 @@ function FindLifts(f : lvlBd := 100 , at_p := false)
     Wp := Weight(B);
     W0 := BianchiWeight(K, 0,0);
     p := Characteristic(B);
-    if at_p then
-	Append(~LR_nums, p*ZK);
+    if includeLvl then
+	Append(~LR_nums, 1*ZK);
 	LR_nums := SortByLMFDBLabel(LR_nums);
     end if;
 
+    if at_p then
+	for fac in Factorization(p*ZK) do
+	    LR_nums cat:= [r * fac[1] : r in LR_nums];
+	end for;
+	LR_nums := SortByLMFDBLabel(LR_nums);
+    end if;
     HeckeField := HeckeField(f);
     
     // TODO: also look for primes dividing level!
     // for I in [I : I in LR_nums | IsCoprime(Level(B), I)] do
+
+    // Caching is supposed to speed this up by storing oldspaces
+    // see https://magma.maths.usyd.edu.au/magma/handbook/text/1784#20376
+    SetStoreModularForms(K, true);
+    print "Factors are", [LMFDBLabel(I) : I in LR_nums];
     for I in LR_nums do
 
 	level2 := I*level1;
@@ -82,8 +93,6 @@ function FindLifts(f : lvlBd := 100 , at_p := false)
 	// end if;
 	primes := SortByLMFDBLabel(Setseq(Keys(Eigenvalues(f))));
 	primes := [qq : qq in primes | IsCoprime(qq,level2)];
-	// Caching speeds this up, see https://magma.maths.usyd.edu.au/magma/handbook/text/1784#20376
-	SetStoreModularForms(K, true);
 	C := BianchiCuspForms(K, level2);
 	if Dimension(C) eq 0 then
 	    print "Characteristic 0 space empty";
@@ -161,6 +170,7 @@ function FindLifts(f : lvlBd := 100 , at_p := false)
 			    if wrong_ctr gt 5 then
 				is_wrong := true;
 				wrong_ctr := 0;
+				print "Eigenvalues didn't match, moving to next";
 				continue aut;
 			    end if;
 			else
@@ -446,4 +456,42 @@ function CheckNonLR()
 	Append(~lifts, <f, FindLifts(f : lvlBd := bound, at_p := true)>);
     end for;
     return lifts;
+end function;
+
+function CheckDouchebag()
+    // This one has small level so it shouldn't be that hard to find lift
+    d := 2;
+    F := QuadFld(d);
+    p := 19;
+    bound := 50;
+    B := BianchiCohomologySpace(LMFDBIdeal(F, "73.2"), BianchiWeight(F,0,0 : char := p));
+    print "Initialized", B;
+    SetHeckeBound(B, bound);
+    print "Computing eigenforms with Hecke bound", bound;
+    lifts := [* *];
+    for f in Eigenforms(B) do
+	print "Eigenvalues:", EigenvalueList(f);
+	Append(~lifts, <f, FindLifts(f : lvlBd := bound, at_p := true, includeLvl := true)>);
+    end for;
+    return lifts;
+
+end function;
+
+function CheckDouchebag2()
+    // This one has small level so it shouldn't be that hard to find lift
+    d := 3;
+    F := QuadFld(d);
+    p := 17;
+    bound := 50;
+    B := BianchiCohomologySpace(LMFDBIdeal(F, "277.1"), BianchiWeight(F,0,0 : char := p));
+    print "Initialized", B;
+    SetHeckeBound(B, bound);
+    print "Computing eigenforms with Hecke bound", bound;
+    lifts := [* *];
+    for f in Eigenforms(B) do
+	print "Eigenvalues:", EigenvalueList(f);
+	Append(~lifts, <f, FindLifts(f : lvlBd := bound, at_p := true, includeLvl := true)>);
+    end for;
+    return lifts;
+
 end function;
