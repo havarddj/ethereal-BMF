@@ -402,3 +402,10 @@ def count_l_vs_ul(d, norm_bd=500, p_bd=20):
     return len(ls)/(len(ls) + len(uls))
 
     
+def count_single_prime_lifts(d):
+    F = QuadFld(d)
+    ls = load_liftable_from_csv(d)
+    def is_good(h):
+        newlvl = level_from_BMF_label(F, h.get_rational_lifts()[0])/h.level()
+        return newlvl.is_prime() and newlvl.is_coprime(h.p())
+    return len([h for h in ls if is_good(h)])/len(ls)

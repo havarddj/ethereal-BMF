@@ -35,7 +35,7 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlBd := 10000 , at_p := false, includeLvl := false)
+function FindLifts(f : lvlBd := 100000 , at_p := false, includeLvl := false)
     // LR_nums := LevelRaiseFactors(f, lvlBd);
     LR_nums := LevelRaisingPrimes(f);
 
@@ -84,7 +84,7 @@ function FindLifts(f : lvlBd := 10000 , at_p := false, includeLvl := false)
     for I in LR_nums do
 	level2 := I*level1;
 	if Norm(level2) gt lvlBd then
-	    print "Skipping level", LMFDBIdeal(I), "since norm is less than norm bound =", lvlBd;
+	    print "Skipping level", LMFDBLabel(I), "since norm is less than norm bound =", lvlBd;
 	    continue;
 	end if;
 	_, princ := IsPrincipal(I);
@@ -521,7 +521,7 @@ function CheckDouchebag2( : recompute:=false, bound := 100)
 
     end if;
     
-    lift := FindLifts(f : lvlBd := bound, at_p := true, includeLvl := true);
+    lift := FindLifts(f : at_p := false, includeLvl := false);
     return lift;
 end function;
 
@@ -530,7 +530,7 @@ function CheckDouchebag3()
     d := 11;
     F := QuadFld(d);
     p := 17;
-    bound := 150;
+    bound := 100;
     B := BianchiCohomologySpace(LMFDBIdeal(F, "69.2"), BianchiWeight(F,0,0 : char := p));
     print "Initialized", B;
     SetHeckeBound(B, bound);

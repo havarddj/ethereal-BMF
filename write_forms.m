@@ -146,29 +146,32 @@ function LookForMultiplicity(d : heckeBd := 100, levelUpperBd := 1000, levelLowe
 	    BEth := EtherealSubspace(B0, Bp);
 	    print "Ethereal subspace:", BEth;
 	    for f in Eigenforms(Bp) do
-		try 
-		    if f in ChangeRing(BEth, BaseRing(f)) and IsCoprime(p*Integers(F), Level(f)) then
-			BLevelRaise := BianchiCohomologySpace(level*p, Wp);
-			SetHeckeBound(BLevelRaise, heckeBd);
-			if Dimension(BLevelRaise) in [1, Dimension(Bp)] then
-			    continue;
-			end if;
-			    
-			print "Computing eigenforms with p in the level; dimension is", Dimension(BLevelRaise);
-
-			for g in Eigenforms(BLevelRaise) do
-			    flag := g`eigenspaceDim gt 1;
-			    flag and:= forall{1 : pp in GoodHeckePrimes(BLevelRaise, heckeBd) | Eigenvalue(g,pp) eq Eigenvalue(f,pp)};
-			    if flag then
-				printf "Located multiplicity %o space of level %o mod %o\n", g`eigenspaceDim, LMFDBLabel(Level(g)), p;
-				return g;
-			    end if;
-			end for;
+		if f in ChangeRing(BEth, BaseRing(f)) and IsCoprime(p*Integers(F), Level(f)) then
+		    BLevelRaise := BianchiCohomologySpace(level*p, Wp);
+		    SetHeckeBound(BLevelRaise, heckeBd);
+		    if Dimension(BLevelRaise) in [1, Dimension(Bp)] then
+			continue;
 		    end if;
-		catch err
-		    print "Failed with error", err;
-		    print f;
-		end try;
+
+		    print "Computing eigenforms with p in the level; dimension is", Dimension(BLevelRaise);
+
+		    for g in Eigenforms(BLevelRaise) do
+			flag := g`eigenspaceDim gt 1;
+			flag and:= forall{1 : pp in PrimesUpTo(heckeBd, F) | Eigenvalue(g,pp) eq Eigenvalue(f,pp)};
+			if flag then
+			    printf "Located multiplicity %o space of level %o mod %o\n", g`eigenspaceDim, LMFDBLabel(Level(g)), p;
+			    return g;
+			else
+			    print "No multiplicity one";
+			    _ := exists(pp){pp : pp in PrimesUpTo(heckeBd, F) | Eigenvalue(g,pp) ne Eigenvalue(f,pp)};
+			    print "They differ at", LMFDBLabel(pp);
+			end if;
+		    end for;
+		end if;
+		// catch err
+		//     print "Failed with error", err;
+		//     print f;
+		// end try;
 	    end for;
 	end for;
     end for;
