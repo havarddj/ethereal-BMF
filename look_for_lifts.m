@@ -35,7 +35,7 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlBd := 100 , at_p := false, includeLvl := false)
+function FindLifts(f : lvlBd := 10000 , at_p := false, includeLvl := false)
     // LR_nums := LevelRaiseFactors(f, lvlBd);
     LR_nums := LevelRaisingPrimes(f);
 
@@ -82,8 +82,11 @@ function FindLifts(f : lvlBd := 100 , at_p := false, includeLvl := false)
     // SetStoreModularForms(K, true);
     print "Factors are", [LMFDBLabel(I) : I in LR_nums];
     for I in LR_nums do
-
 	level2 := I*level1;
+	if Norm(level2) gt lvlBd then
+	    print "Skipping level", LMFDBIdeal(I), "since norm is less than norm bound =", lvlBd;
+	    continue;
+	end if;
 	_, princ := IsPrincipal(I);
 	print "Looking for lifts with level", LMFDBLabel(I), "=", K!princ, "added; new level is", LMFDBLabel(level2);
 	// print "Can kill lifting obstruction?", CanKillLiftingObstr(p, level2,level1);
@@ -433,10 +436,19 @@ function LookForAllIrrational(d)
 	    continue;
 	end if;
 	
-	
-	print "Looking for lifts of line", line;
-	res := CheckNonrationalLift(d, line, topLine);
 	id := Split(line, ";")[1] cat ";" cat Split(line, ";")[2] cat ";";
+	if id in Read(output) then
+	    continue;
+	end if;
+	print "Looking for lifts of id", id;
+	try 
+	    res := CheckNonrationalLift(d, line, topLine);
+	catch err
+	    print "Failed to initalize class with error", err;
+	    continue line;
+	end try;
+	
+
 	// if Sprint(res) eq "None found" then
 	fprintf output, id cat Sprint(res) cat "\n";
 	    // else
@@ -526,7 +538,7 @@ function CheckDouchebag3()
     lifts := [* *];
     for f in Eigenforms(B) do
 	print "Eigenvalues:", EigenvalueList(f);
-	Append(~lifts, <f, FindLifts(f : lvlBd := bound, at_p := false, includeLvl := false)>);
+	Append(~lifts, <f, FindLifts(f : lvlBd := 5000, at_p := false, includeLvl := false)>);
     end for;
     return lifts;
 
