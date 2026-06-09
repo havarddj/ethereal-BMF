@@ -39,6 +39,7 @@ function FindLifts(f : lvlBd := 100000 , at_p := false, includeLvl := false)
     // LR_nums := LevelRaiseFactors(f, lvlBd);
     LR_nums := LevelRaisingPrimes(f);
 
+    LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
 
     if #LR_nums eq 0 then
 	return "No level raising primes available";
