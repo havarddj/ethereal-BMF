@@ -104,10 +104,14 @@ function RecomputeIrrational(d : heckeBd := 100, lvlLowerBd := 0, lvlUpperBd := 
 		BG := EtherealSubspace(B1,B2);
 		print BG;
 		for f in Eigenforms(B2) do
-		    
 		    if f`eigenspaceDim gt 1 then
 			print "Found eigenspace of dimension", f`eigenspaceDim;
 		    end if;
+		    if Degree(BaseRing(f)) eq 1 then
+			print "Not irrational, skipping";
+			continue;
+		    end if;
+		    
 		    if not IsEisenstein(f) and f in ChangeRing(BG, BaseRing(f)) and f`eigenspaceDim eq 1 then
 			WriteClass(f, filename : labels := primeLabels);
 			print "Wrote class to file!";
