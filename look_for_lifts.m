@@ -35,11 +35,10 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlBd := 100000 , at_p := false, includeLvl := false)
-    // LR_nums := LevelRaiseFactors(f, lvlBd);
-    LR_nums := LevelRaisingPrimes(f);
-
-    LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
+function FindLifts(f : lvlLowerBd := 0, lvlBd := 1000000 , at_p := false, includeLvl := false)
+    LR_nums := LevelRaiseFactors(f, Min(Floor(lvlBd/Norm(Level(f))), 4000));
+    // LR_nums := LevelRaisingPrimes(f);
+    // LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
 
     if #LR_nums eq 0 then
 	return "No level raising primes available";
@@ -75,17 +74,14 @@ function FindLifts(f : lvlBd := 100000 , at_p := false, includeLvl := false)
 
     HeckeField := HeckeField(f);
     
-    // TODO: also look for primes dividing level!
-    // for I in [I : I in LR_nums | IsCoprime(Level(B), I)] do
-
     // Caching is supposed to speed this up by storing oldspaces
     // see https://magma.maths.usyd.edu.au/magma/handbook/text/1784#20376
-    // SetStoreModularForms(K, true);
-    print "Factors are", [LMFDBLabel(I) : I in LR_nums];
+    SetStoreModularForms(K, true);
+    // print "Factors are", [LMFDBLabel(I) : I in LR_nums];
     for I in LR_nums do
 	level2 := I*level1;
-	if Norm(level2) gt lvlBd then
-	    print "Skipping level", LMFDBLabel(I), "since norm is less than norm bound =", lvlBd;
+	if Norm(level2) gt lvlBd or Norm(level2) lt lvlLowerBd then
+	    print "Skipping level", LMFDBLabel(I), "since not in range specified by lvlLowerBd and lvlBd";
 	    continue;
 	end if;
 	_, princ := IsPrincipal(I);
@@ -107,6 +103,7 @@ function FindLifts(f : lvlBd := 100000 , at_p := false, includeLvl := false)
 	if Dimension(C) eq 0 then
 	    print "Characteristic 0 space empty";
 	end if;
+	print "Computing eigenforms, this may take time";
 	
 	for j -> F in NewformDecomposition(NewSubspace(C)) do
 	    print "Testing eigenform", j;
@@ -118,7 +115,10 @@ function FindLifts(f : lvlBd := 100000 , at_p := false, includeLvl := false)
 		z := Rationals()!1;
 	    end if;
 	    
-	    if Degree(E) lt Degree(K) then continue; end if;
+	    if Degree(E) lt Degree(HeckeField) then
+		print "Degree of char 0 eigenvalue field is too small";
+		continue;
+	    end if;
 	    
 	    print "Eigenvalues of char 0 lift lie in", E, "of discriminant", Discriminant(Integers(E));
 	    p_primes := [m[1] : m in Factorization(p*Integers(E))];
@@ -177,6 +177,8 @@ function FindLifts(f : lvlBd := 100000 , at_p := false, includeLvl := false)
 			    // This is not the right one, so move on to another level raising prime;
 			    // but we will allow a couple of mismatches just in case.
 			    wrong_ctr +:= 1;
+			    print "Hecke eigenvalues don't agree for", LMFDBLabel(qq);
+			    
 			    if wrong_ctr gt 5 then
 				is_wrong := true;
 				wrong_ctr := 0;
@@ -254,9 +256,6 @@ function BatchFindIrrationalLifts(d : lvlBd := 100)
     return 0;
 end function;
 
-function FindIrrationalLifts(f)
-    LRPrimes := LevelRaisingPrimes(f);
-end function;
 
 /*
 Helper function to load rational lifts.
@@ -482,15 +481,15 @@ function CheckDouchebag()
     d := 2;
     F := QuadFld(d);
     p := 19;
-    bound := 50;
+    bound := 200;
     B := BianchiCohomologySpace(LMFDBIdeal(F, "73.2"), BianchiWeight(F,0,0 : char := p));
     print "Initialized", B;
     SetHeckeBound(B, bound);
     print "Computing eigenforms with Hecke bound", bound;
     lifts := [* *];
     for f in Eigenforms(B) do
-	print "Eigenvalues:", EigenvalueList(f);
-	Append(~lifts, <f, FindLifts(f : lvlBd := bound, at_p := true, includeLvl := true)>);
+	print "Eigenvalues:", PrintEigenvalues(f : bd := bound);
+	Append(~lifts, <f, FindLifts(f : at_p := false, includeLvl := false)>);
     end for;
     return lifts;
 
