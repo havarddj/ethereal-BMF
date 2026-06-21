@@ -370,9 +370,10 @@ def level_from_BMF_label(F, label):
     return ideal_from_label(F, label.split('-')[1])
     
 
-def count_p_liftable(d):
+def load_p_liftable(d):
     evs = load_liftable_from_csv(d)
     F = QuadFld(d)
+    p_evs = []
     p_count = 0
     for ev in evs:
         has_p_lift = False
@@ -382,13 +383,11 @@ def count_p_liftable(d):
             lift_lvl = level_from_BMF_label(F, lift)
             factors = [fac[0] for fac in (lift_lvl/lvl).factor()]
             if not any([fac.is_coprime(p) for fac in factors]):
-                print(p, ideal_label(lift_lvl/lvl))
-                has_p_lift = True
+                print(p, ideal_label(lvl), ideal_label(lift_lvl/lvl))
+                p_evs.append(ev)
                 break
-        if has_p_lift:
-            p_count +=1
-    print(f"{p_count}/{len(evs)} have p-lifts")
-    return p_count
+    print(f"{len(p_evs)}/{len(evs)} have p-lifts")
+    return p_evs
 
             
         

@@ -489,7 +489,7 @@ function CheckDouchebag()
     lifts := [* *];
     for f in Eigenforms(B) do
 	print "Eigenvalues:", PrintEigenvalues(f : bd := bound);
-	Append(~lifts, <f, FindLifts(f : at_p := false, includeLvl := false)>);
+	Append(~lifts, <f, FindLifts(f : at_p := true, includeLvl := false)>);
     end for;
     return lifts;
 
