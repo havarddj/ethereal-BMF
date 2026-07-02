@@ -32,7 +32,8 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 		B2 := BianchiCohomologySpace(level,wt2);
 		SetHeckeBound(B2, heckeBd);
 		//BG := EtherealSubspace(B1,B2);
-		print BG;
+		//print BG;
+		print B2;
 		for f in Eigenforms(B2) do
 		    if not IsEisenstein(f) and f in HasEtherealEigenvalues(B1,f) and f`eigenspaceDim eq 1 then
 			WriteClass(f, filename : labels := labels);
@@ -88,7 +89,7 @@ function RecomputeIrrational(d : heckeBd := 100, lvlLowerBd := 0, lvlUpperBd := 
 
 	// Keep track of levels and primes computed so we don't double count Hecke conjugates
 	if [*level,p*] in recomputedPairs then
-	    printf "Already computed lifts for this system: %o" [*level,p*];
+	    printf "Already computed lifts for this system: %o", [*level,p*];
 	    continue;
 	end if;
 	Append(~recomputedPairs, [*level,p*]);
