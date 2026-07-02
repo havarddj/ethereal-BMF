@@ -20,7 +20,7 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
     for L in levels_and_primes do
 	level_gen := L[1];
 	level := (ZF!level_gen)*ZF;
-	// if startBd is non-zero
+	// if levelLowerBd is non-zero
 	if Norm(level) lt levelLowerBd then
 	    continue;
 	end if;
