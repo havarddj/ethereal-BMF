@@ -31,12 +31,12 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 		wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
 		B2 := BianchiCohomologySpace(level,wt2);
 		SetHeckeBound(B2, heckeBd);
-		BG := EtherealSubspace(B1,B2);
+		//BG := EtherealSubspace(B1,B2);
 		print BG;
 		for f in Eigenforms(B2) do
-		    if not IsEisenstein(f) and f in ChangeRing(BG,BaseRing(f)) and f`eigenspaceDim eq 1 then
+		    if not IsEisenstein(f) and f in HasEtherealEigenvalues(B1,f) and f`eigenspaceDim eq 1 then
 			WriteClass(f, filename : labels := labels);
-			print "Wrote class to file!";
+			print "Wrote class to file!\n";
 		    end if;
 		end for;
 	    catch err;
@@ -88,7 +88,7 @@ function RecomputeIrrational(d : heckeBd := 100, lvlLowerBd := 0, lvlUpperBd := 
 
 	// Keep track of levels and primes computed so we don't double count Hecke conjugates
 	if [*level,p*] in recomputedPairs then
-	    print "Already computed lifts for this system";
+	    printf "Already computed lifts for this system: %o" [*level,p*];
 	    continue;
 	end if;
 	Append(~recomputedPairs, [*level,p*]);
@@ -99,11 +99,10 @@ function RecomputeIrrational(d : heckeBd := 100, lvlLowerBd := 0, lvlUpperBd := 
 		wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
 		B2 := BianchiCohomologySpace(level,wt2);
 		SetHeckeBound(B2, heckeBd);
-		print "Computing ethereal subspace";
-	
-		BG := EtherealSubspace(B1,B2);
-		print BG;
-		for f in Eigenforms(B2) do
+		//print "Computing ethereal subspace";
+		//BG := EtherealSubspace(B1,B2);
+		//print BG;
+		for f in EigenformGaloisRepresentatives(B2) do
 		    if f`eigenspaceDim gt 1 then
 			print "Found eigenspace of dimension", f`eigenspaceDim;
 		    end if;
@@ -111,8 +110,12 @@ function RecomputeIrrational(d : heckeBd := 100, lvlLowerBd := 0, lvlUpperBd := 
 			print "Not irrational, skipping";
 			continue;
 		    end if;
+
+		    // this is the degree of the hecke field, excluding those with HFDeg == 1 means 
+		    // we don't add char. 0 forms to the file again
+		    HFDeg := Degree(SmallestFiniteField(EigenvalueList(f)));
 		    
-		    if not IsEisenstein(f) and f in ChangeRing(BG, BaseRing(f)) and f`eigenspaceDim eq 1 then
+		    if not IsEisenstein(f) and HasEtherealEigenvalues(B1,f) and f`eigenspaceDim eq 1 and HFDeg ne 1 then
 			WriteClass(f, filename : labels := primeLabels);
 			print "Wrote class to file!";
 		    end if;
