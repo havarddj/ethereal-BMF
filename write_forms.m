@@ -34,8 +34,8 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 		//BG := EtherealSubspace(B1,B2);
 		//print BG;
 		print B2;
-		for f in Eigenforms(B2) do
-		    if not IsEisenstein(f) and f in HasEtherealEigenvalues(B1,f) and f`eigenspaceDim eq 1 then
+		for f in EigenformGaloisRepresentatives(B2) do
+		    if not IsEisenstein(f) and HasEtherealEigenvalues(B1,f) and f`eigenspaceDim eq 1 then
 			WriteClass(f, filename : labels := labels);
 			print "Wrote class to file!\n";
 		    end if;
@@ -45,6 +45,7 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 		fprintf filename, "%o; %o; ERROR\n", LMFDBLabel(level), p;
 	    end try;
 	end for;
+	print "";
     end for;
     return "";
 end function;
