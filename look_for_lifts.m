@@ -544,3 +544,117 @@ function CheckDouchebag3()
 
 end function;
 
+// turns a line from d*_liftable.csv into its raw data so we can feed it into VerifyLMFDBLift
+function UnpackLiftableString(lmfdbstr)
+	ss := Split(lmfdbstr,";");
+	levelLabel := ss[1];
+	p := StringToInteger(ss[2]);
+	eigs := [StringToInteger(u) : u in Split(ss[3][2..#ss[3]-1],",")];
+
+	// little utility function to extract the level from a BMF label 
+	function BMFLabelToLevel(foo)
+		bar := foo[Index(foo,"-")+1..#foo-1];
+		return bar[1..Index(bar,"-")-1];
+	end function;
+
+	liftlabels := [BMFLabelToLevel(u) : u in Split(ss[4][2..#ss[4]-1],",")];
+
+	return levelLabel,p,eigs,liftlabels;
+end function;
+
+// tries to verify a probable lift from LMFDB data via cocycles. `zealous` option 
+// checks all of them, rather than quitting once one has been found.
+function VerifyLMFDBLift(d,str : zealous := false)
+	K := QuadFld(d);
+	ZK := MaximalOrder(K);
+
+	levelLabel,p,eigs,liftLabels := UnpackLiftableString(str);
+
+	level1 := LMFDBIdeal(K, levelLabel);
+
+	W1 := BianchiWeight(K, 0, 0 : char := p);
+	W2 := BianchiWeight(K, 0, 0);
+	B1 := BianchiCohomologySpace(level1, W1);
+
+	s := Split(Read("data/nonEis_d" cat Sprint(d) cat ".csv"),"\n")[1];
+	// this cuts out just the part of the string with the labels 
+	pp := s[9..#s-14];
+	PP := [LMFDBIdeal(K,u) : u in Split(pp,";")];
+
+	// this feels quite silly, having to re-egineer the string.
+	fstr := levelLabel cat ";" cat Sprint(p) cat ";" cat &cat[Sprint(u) cat ";" : u in eigs];
+	f := ReadClass(fstr,B1,PP);
+
+	if zealous then
+		lift_bools := [];
+	end if;
+
+	for label in liftLabels do 
+		level2 := LMFDBIdeal(K, label);
+
+		B2 := BianchiCohomologySpace(level2, W1);
+		B3 := BianchiCohomologySpace(level2, W2);
+
+		// this is the level-raise factor 
+		D := level2/level1;
+		if GCD(level1,D) eq 1*ZK then 
+			level_raise_f := [RaiseCocycleLevel(B1,B2,f,dd) : dd in Divisors(D)];
+		else 
+			level_raise_f := [RaiseCocycleLevelSlow(B1,B2,f,dd) : dd in Divisors(D)];
+		end if;
+		level_raise_space := sub<B2`forms | [B2`down(ff`Zvector) : ff in level_raise_f]>;
+
+		red := ReductionModPMap(B3, B2);
+		red_forms := sub<B2`forms | [B2`down(red(B3`Z.i)) : i in [1..Dimension(B3`Z)]]>;
+
+		lb := Dimension(level_raise_space meet red_forms) ge 1;
+
+		if zealous then 
+			Append(~lift_bools,lb);
+		else 
+			if lb then 
+				return true,label;
+			end if;
+		end if;
+
+	end for;
+
+	if zealous then 
+		return lift_bools;
+	else 
+		return false;
+	end if;
+
+end function;
+
+
+function CheckEtheralData()
+	d := 1;
+	K := QuadFld(d);
+	ZK := MaximalOrder(K);
+
+	rr := Read("data/nonEis_d1.csv");
+	data := Split(rr,"\n");
+
+	primeLabels := data[1][8..#data[1]-14];
+	primeList := [LMFDBIdeal(K,u) : u in Split(primeLabels,";")];
+
+	// we check each row of the file for forms wrongly marked as ethereal 
+	for e in data[2..#data] do 
+		ss := Split(e,";");
+		level := LMFDBIdeal(K,ss[1]);
+		p := StringToInteger(ss[2]);
+		B := BianchiCohomologySpace(level,BianchiWeight(K,0,0 : char := p));
+		B0 := BianchiCohomologySpace(level,BianchiWeight(K,0,0));
+		f := ReadClass(e,B,primeList);
+		if not HasEtherealEigenvalues(B0,f) then 
+			print "Eigenvalue system falsely labelled ethereal";
+		else 
+			print "Eigenvalue system is ethereal";
+		end if;
+		print e;
+		print "";
+	end for;
+
+end function;
+

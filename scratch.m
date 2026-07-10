@@ -1,7 +1,7 @@
 load "write_forms.m";
 
-d := 3;
-lo := 0;
-up := 1000;
+d := 11;
+lo := 397;
+up := 397;
 
 ComputeNonliftable(d : levelUpperBd := up, levelLowerBd := lo);
