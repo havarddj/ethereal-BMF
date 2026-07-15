@@ -82,7 +82,7 @@ end for;
 // once we have all of these, we check against the data files to see 
 // if any levels failed to write, got eaten by another process, etc. 
 
-d := 11;
+d := 2;
 forms_d := forms_written[Index([1,2,3,7,11],d)];
 
 forms_data := Read("data/nonEis_d" cat Sprint(d) cat ".csv");
