@@ -1,0 +1,168 @@
+nohup: ignoring input
+Magma V2.29-3     Fri Jul  3 2026 11:53:10 on albona   [Seed = 1968713213]
+Type ? for help.  Type <Ctrl>-D to quit.
+
+Loading file "scratch.m"
+Loading "write_forms.m"
+Loading "homology_torsion.m"
+Computing H_1 to find nonliftable forms
+Finished computing H_1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 802.4 of dimension 11
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 802.4 of dimension 4
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 802.4 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 139 
+and level 802.4 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 347 
+and level 802.4 of dimension 2
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 802.3 of dimension 9
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 802.3 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 802.3 of dimension 4
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 37 and
+level 802.3 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 347 
+and level 802.3 of dimension 3
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 809.1 of dimension 7
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 101 
+and level 809.1 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 541 
+and level 809.1 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 6521 
+and level 809.1 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 812.6 of dimension 19
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 812.6 of dimension 6
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 812.6 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 812.6 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 812.6 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 43 and
+level 812.6 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 812.4 of dimension 29
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 812.4 of dimension 14
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 812.4 of dimension 7
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 812.4 of dimension 5
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 812.2 of dimension 17
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 812.2 of dimension 9
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 812.2 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 812.2 of dimension 3
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 814.1 of dimension 10
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 814.1 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 814.1 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 814.1 of dimension 4
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 23 and
+level 814.1 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 101 
+and level 814.1 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 814.3 of dimension 14
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 814.3 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 814.3 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 23 and
+level 814.3 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 43 and
+level 814.3 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 814.7 of dimension 14
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 814.7 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 814.7 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 814.7 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 23 and
+level 814.7 of dimension 2
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 814.4 of dimension 19
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 814.4 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 814.4 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 814.4 of dimension 4
+
+
+
+Total time: 143729.399 seconds, Total memory usage: 2585.19MB
+140341.94user 3387.58system 39:55:38elapsed 99%CPU (0avgtext+0avgdata 2655444maxresident)k
+35104inputs+720outputs (615major+1561671934minor)pagefaults 0swaps

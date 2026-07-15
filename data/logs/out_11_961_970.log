@@ -1,0 +1,100 @@
+nohup: ignoring input
+Magma V2.29-3     Mon Jul  6 2026 08:14:11 on escona   [Seed = 2726444855]
+Type ? for help.  Type <Ctrl>-D to quit.
+
+Loading file "scratch.m"
+Loading "write_forms.m"
+Loading "homology_torsion.m"
+Computing H_1 to find nonliftable forms
+Finished computing H_1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 961.2 of dimension 23
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 961.2 of dimension 6
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 961.2 of dimension 6
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 83207 
+and level 961.2 of dimension 6
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 961.1 of dimension 19
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 961.1 of dimension 16
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 961.1 of dimension 17
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 29 and
+level 961.1 of dimension 16
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 31 and
+level 961.1 of dimension 16
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+
+
+Total time: 23342.009 seconds, Total memory usage: 1887.25MB
+22220.47user 1121.56system 6:29:02elapsed 99%CPU (0avgtext+0avgdata 1913204maxresident)k
+24inputs+376outputs (0major+761206733minor)pagefaults 0swaps

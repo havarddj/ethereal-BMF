@@ -1,0 +1,107 @@
+nohup: ignoring input
+Magma V2.29-3     Fri Jul  3 2026 16:20:03 on verona   [Seed = 2578757453]
+Type ? for help.  Type <Ctrl>-D to quit.
+
+Loading file "scratch.m"
+Loading "write_forms.m"
+Loading "homology_torsion.m"
+Computing H_1 to find nonliftable forms
+Finished computing H_1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 921.1 of dimension 12
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 921.1 of dimension 3
+error: 
+ComputeNonliftable(
+    d: 2
+)
+EigenformGaloisRepresentatives(
+    B: Bianchi cohomology space of weight Bianchi weight (0 0) in c...
+)
+Eigenforms(
+    B: Bianchi cohomology space of weight Bianchi weight (0 0) in c...
+)
+CommonGeneralizedEigenspaces(
+    A: [ [1 0 0] [0 1 1] [0 0 0],  [0 0 0] [0 0 0] [0 0 0],  [0 1 1...
+)
+CommonEigenspaces(
+    Q: [ [    1     0     0] [    0     1     1] [    0     0     0...
+)
+In file "/usr/sms/share/magma/n/package/Algebra/AlgMat/General/diagonal.m", line
+61, column 15:
+>>         Append(~eigvals_, ev cat [e[1]]);
+                 ^
+Runtime error in 'Append': Cannot coerce element into the universe
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 921.1 of dimension 3
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 921.1 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 17 and
+level 921.1 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 97 and
+level 921.1 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 107 
+and level 921.1 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 921.2 of dimension 9
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 921.2 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 921.2 of dimension 4
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 921.2 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 17 and
+level 921.2 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 31 and
+level 921.2 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 97 and
+level 921.2 of dimension 2
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 929.1 of dimension 8
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 929.1 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 29 and
+level 929.1 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 31 and
+level 929.1 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 100333
+and level 929.1 of dimension 2
+
+Wrote class to file!
+
+
+
+
+Total time: 98336.160 seconds, Total memory usage: 1900.78MB
+98323.29user 12.93system 27:23:47elapsed 99%CPU (0avgtext+0avgdata 1831988maxresident)k
+0inputs+352outputs (0major+4403838minor)pagefaults 0swaps

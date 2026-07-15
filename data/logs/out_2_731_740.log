@@ -1,0 +1,168 @@
+nohup: ignoring input
+Magma V2.29-3     Mon Jul  6 2026 08:21:18 on albona   [Seed = 3181191250]
+Type ? for help.  Type <Ctrl>-D to quit.
+
+Loading file "scratch.m"
+Loading "write_forms.m"
+Loading "homology_torsion.m"
+Computing H_1 to find nonliftable forms
+Finished computing H_1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 731.1 of dimension 9
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 731.1 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 731.1 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 731.1 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 31 and
+level 731.1 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 89 and
+level 731.1 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 179 
+and level 731.1 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 731.3 of dimension 5
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 731.3 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 731.3 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 19 and
+level 731.3 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 31 and
+level 731.3 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 67 and
+level 731.3 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 761 
+and level 731.3 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 737.3 of dimension 9
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 737.3 of dimension 5
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 737.3 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 737.3 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 617 
+and level 737.3 of dimension 2
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 737.1 of dimension 11
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 737.1 of dimension 5
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 737.1 of dimension 3
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 737.1 of dimension 3
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 737.1 of dimension 4
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 787 
+and level 737.1 of dimension 3
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 738.1 of dimension 27
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 738.1 of dimension 14
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 738.1 of dimension 7
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 738.1 of dimension 8
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 738.5 of dimension 35
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 738.5 of dimension 16
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 738.5 of dimension 16
+
+Wrote class to file!
+
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 738.3 of dimension 49
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 738.3 of dimension 6
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 738.3 of dimension 3
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 738.3 of dimension 4
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 19 and
+level 738.3 of dimension 4
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 739.2 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 739.2 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 739.2 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 739.2 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 41 and
+level 739.2 of dimension 3
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 349 
+and level 739.2 of dimension 1
+
+Wrote class to file!
+
+
+
+
+Total time: 126997.929 seconds, Total memory usage: 2406.56MB
+115935.52user 11062.52system 35:17:03elapsed 99%CPU (0avgtext+0avgdata 2487004maxresident)k
+30824inputs+712outputs (5major+5207713821minor)pagefaults 0swaps

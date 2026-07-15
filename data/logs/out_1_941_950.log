@@ -1,0 +1,63 @@
+nohup: ignoring input
+Magma V2.29-3     Fri Jul  3 2026 16:04:37 on verona   [Seed = 3370515852]
+Type ? for help.  Type <Ctrl>-D to quit.
+
+Loading file "scratch.m"
+Loading "write_forms.m"
+Loading "homology_torsion.m"
+Computing H_1 to find nonliftable forms
+Finished computing H_1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 941.2 of dimension 5
+error: 
+ComputeNonliftable(
+    d: 1
+)
+EigenformGaloisRepresentatives(
+    B: Bianchi cohomology space of weight Bianchi weight (0 0) in c...
+)
+Eigenforms(
+    B: Bianchi cohomology space of weight Bianchi weight (0 0) in c...
+)
+CommonGeneralizedEigenspaces(
+    A: [ [0 0 1 1 0] [0 0 0 0 1] [0 0 1 0 0] [0 0 0 1 0] [0 0 0 0 1...
+)
+CommonEigenspaces(
+    Q: [ [    0     0     1     1     0] [    0     0     0     0  ...
+)
+In file "/usr/sms/share/magma/n/package/Algebra/AlgMat/General/diagonal.m", line
+61, column 15:
+>>         Append(~eigvals_, ev cat [e[1]]);
+                 ^
+Runtime error in 'Append': Cannot coerce element into the universe
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 941.2 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 47 and
+level 941.2 of dimension 1
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 949.3 of dimension 4
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 949.3 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 19 and
+level 949.3 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 131 
+and level 949.3 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 949.1 of dimension 5
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 949.1 of dimension 2
+
+
+
+Total time: 24724.759 seconds, Total memory usage: 739.34MB
+24719.28user 5.52system 6:53:00elapsed 99%CPU (0avgtext+0avgdata 790196maxresident)k
+30016inputs+152outputs (1major+1258119minor)pagefaults 0swaps

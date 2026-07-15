@@ -1,0 +1,46 @@
+nohup: ignoring input
+Magma V2.29-3     Fri Jul  3 2026 16:06:53 on verona   [Seed = 721821655]
+Type ? for help.  Type <Ctrl>-D to quit.
+
+Loading file "scratch.m"
+Loading "write_forms.m"
+Loading "homology_torsion.m"
+Computing H_1 to find nonliftable forms
+Finished computing H_1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 997.1 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 997.1 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 83 and
+level 997.1 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 509 
+and level 997.1 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 1000.3 of dimension 23
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 1000.3 of dimension 15
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 1000.4 of dimension 13
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 1000.4 of dimension 10
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 1000.4 of dimension 9
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 1000.4 of dimension 9
+
+Wrote class to file!
+
+
+
+
+Total time: 79523.179 seconds, Total memory usage: 2504.78MB
+75617.59user 3905.68system 22:08:49elapsed 99%CPU (0avgtext+0avgdata 2563456maxresident)k
+0inputs+160outputs (0major+1676295755minor)pagefaults 0swaps

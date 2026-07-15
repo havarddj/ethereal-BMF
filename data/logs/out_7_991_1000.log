@@ -1,0 +1,98 @@
+nohup: ignoring input
+Magma V2.29-3     Fri Jul  3 2026 13:31:02 on albona   [Seed = 3370494625]
+Type ? for help.  Type <Ctrl>-D to quit.
+
+Loading file "scratch.m"
+Loading "write_forms.m"
+Loading "homology_torsion.m"
+Computing H_1 to find nonliftable forms
+Finished computing H_1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 991.2 of dimension 3
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 991.2 of dimension 3
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 991.2 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 11 and
+level 991.2 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 13 and
+level 991.2 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 619 
+and level 991.2 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 4091 
+and level 991.2 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 994.1 of dimension 14
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 994.1 of dimension 3
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 994.1 of dimension 3
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 994.1 of dimension 4
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 13 and
+level 994.1 of dimension 3
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 107 
+and level 994.1 of dimension 4
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 379 
+and level 994.1 of dimension 4
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 994.3 of dimension 12
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 994.3 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 5 and 
+level 994.3 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 994.3 of dimension 5
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 107 
+and level 994.3 of dimension 2
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 379 
+and level 994.3 of dimension 2
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 998.4 of dimension 14
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 998.4 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 83 and
+level 998.4 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 293 
+and level 998.4 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7757 
+and level 998.4 of dimension 2
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 998.2 of dimension 14
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 998.2 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 83 and
+level 998.2 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7757 
+and level 998.2 of dimension 2
+
+
+
+Total time: 223045.239 seconds, Total memory usage: 4544.19MB
+204073.13user 18972.25system 61:57:40elapsed 99%CPU (0avgtext+0avgdata 4537464maxresident)k
+0inputs+392outputs (0major+8800361733minor)pagefaults 0swaps

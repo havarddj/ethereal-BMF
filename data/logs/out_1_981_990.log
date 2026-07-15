@@ -1,0 +1,65 @@
+nohup: ignoring input
+Magma V2.29-3     Fri Jul  3 2026 16:06:36 on verona   [Seed = 1716212365]
+Type ? for help.  Type <Ctrl>-D to quit.
+
+Loading file "scratch.m"
+Loading "write_forms.m"
+Loading "homology_torsion.m"
+Computing H_1 to find nonliftable forms
+Finished computing H_1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 981.2 of dimension 5
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 3 and 
+level 981.2 of dimension 2
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 23 and
+level 981.2 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 985.1 of dimension 9
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 985.1 of dimension 3
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 985.2 of dimension 4
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 985.2 of dimension 1
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 13 and
+level 985.2 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 29 and
+level 985.2 of dimension 1
+
+Wrote class to file!
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 103 
+and level 985.2 of dimension 1
+
+Wrote class to file!
+
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 986.1 of dimension 12
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 986.1 of dimension 1
+
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 2 and 
+level 986.3 of dimension 12
+Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 7 and 
+level 986.3 of dimension 2
+
+
+
+Total time: 52609.529 seconds, Total memory usage: 1705.78MB
+52589.02user 20.59system 14:39:18elapsed 99%CPU (0avgtext+0avgdata 1788456maxresident)k
+0inputs+248outputs (0major+8789598minor)pagefaults 0swaps

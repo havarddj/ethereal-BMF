@@ -1,0 +1,263 @@
+nohup: ignoring input
+Magma V2.29-3     Fri Jun  5 2026 13:23:13 on esdona   [Seed = 138426354]
+Type ? for help.  Type <Ctrl>-D to quit.
+
+Loading file "douche.m"
+Loading "look_for_lifts.m"
+Initialized Bianchi cohomology space of weight Bianchi weight (0 0) in characteristic 17 and
+level 277.1 of dimension 1
+Computing eigenforms with Hecke bound 1000
+Computing Hecke operator for 3.1 this could be slow
+Computing Hecke operator for 4.1 this could be slow
+Computing Hecke operator for 7.1 this could be slow
+Computing Hecke operator for 7.2 this could be slow
+Computing Hecke operator for 13.2 this could be slow
+Computing Hecke operator for 13.1 this could be slow
+Computing Hecke operator for 19.1 this could be slow
+Computing Hecke operator for 19.2 this could be slow
+Computing Hecke operator for 25.1 this could be slow
+Computing Hecke operator for 31.1 this could be slow
+Computing Hecke operator for 31.2 this could be slow
+Computing Hecke operator for 37.1 this could be slow
+Computing Hecke operator for 37.2 this could be slow
+Computing Hecke operator for 43.2 this could be slow
+Computing Hecke operator for 43.1 this could be slow
+Computing Hecke operator for 61.1 this could be slow
+Computing Hecke operator for 61.2 this could be slow
+Computing Hecke operator for 67.2 this could be slow
+Computing Hecke operator for 67.1 this could be slow
+Computing Hecke operator for 73.1 this could be slow
+Computing Hecke operator for 73.2 this could be slow
+Computing Hecke operator for 79.2 this could be slow
+Computing Hecke operator for 79.1 this could be slow
+Computing Hecke operator for 97.1 this could be slow
+Computing Hecke operator for 97.2 this could be slow
+Computing Hecke operator for 103.2 this could be slow
+Computing Hecke operator for 103.1 this could be slow
+Computing Hecke operator for 109.1 this could be slow
+Computing Hecke operator for 109.2 this could be slow
+Computing Hecke operator for 121.1 this could be slow
+Computing Hecke operator for 127.1 this could be slow
+Computing Hecke operator for 127.2 this could be slow
+Computing Hecke operator for 139.2 this could be slow
+Computing Hecke operator for 139.1 this could be slow
+Computing Hecke operator for 151.1 this could be slow
+Computing Hecke operator for 151.2 this could be slow
+Computing Hecke operator for 157.1 this could be slow
+Computing Hecke operator for 157.2 this could be slow
+Computing Hecke operator for 163.2 this could be slow
+Computing Hecke operator for 163.1 this could be slow
+Computing Hecke operator for 181.2 this could be slow
+Computing Hecke operator for 181.1 this could be slow
+Computing Hecke operator for 193.1 this could be slow
+Computing Hecke operator for 193.2 this could be slow
+Computing Hecke operator for 199.1 this could be slow
+Computing Hecke operator for 199.2 this could be slow
+Computing Hecke operator for 211.2 this could be slow
+Computing Hecke operator for 211.1 this could be slow
+Computing Hecke operator for 223.1 this could be slow
+Computing Hecke operator for 223.2 this could be slow
+Computing Hecke operator for 229.2 this could be slow
+Computing Hecke operator for 229.1 this could be slow
+Computing Hecke operator for 241.2 this could be slow
+Computing Hecke operator for 241.1 this could be slow
+Computing Hecke operator for 271.1 this could be slow
+Computing Hecke operator for 271.2 this could be slow
+Computing Hecke operator for 277.2 this could be slow
+Computing Hecke operator for 277.1 this could be slow
+Computing Hecke operator for 283.2 this could be slow
+Computing Hecke operator for 283.1 this could be slow
+Computing Hecke operator for 289.1 this could be slow
+Computing Hecke operator for 307.2 this could be slow
+Computing Hecke operator for 307.1 this could be slow
+Computing Hecke operator for 313.2 this could be slow
+Computing Hecke operator for 313.1 this could be slow
+Computing Hecke operator for 331.2 this could be slow
+Computing Hecke operator for 331.1 this could be slow
+Computing Hecke operator for 337.2 this could be slow
+Computing Hecke operator for 337.1 this could be slow
+Computing Hecke operator for 349.2 this could be slow
+Computing Hecke operator for 349.1 this could be slow
+Computing Hecke operator for 367.1 this could be slow
+Computing Hecke operator for 367.2 this could be slow
+Computing Hecke operator for 373.2 this could be slow
+Computing Hecke operator for 373.1 this could be slow
+Computing Hecke operator for 379.1 this could be slow
+Computing Hecke operator for 379.2 this could be slow
+Computing Hecke operator for 397.2 this could be slow
+Computing Hecke operator for 397.1 this could be slow
+Computing Hecke operator for 409.2 this could be slow
+Computing Hecke operator for 409.1 this could be slow
+Computing Hecke operator for 421.2 this could be slow
+Computing Hecke operator for 421.1 this could be slow
+Computing Hecke operator for 433.1 this could be slow
+Computing Hecke operator for 433.2 this could be slow
+Computing Hecke operator for 439.2 this could be slow
+Computing Hecke operator for 439.1 this could be slow
+Computing Hecke operator for 457.2 this could be slow
+Computing Hecke operator for 457.1 this could be slow
+Computing Hecke operator for 463.2 this could be slow
+Computing Hecke operator for 463.1 this could be slow
+Computing Hecke operator for 487.2 this could be slow
+Computing Hecke operator for 487.1 this could be slow
+Computing Hecke operator for 499.2 this could be slow
+Computing Hecke operator for 499.1 this could be slow
+Computing Hecke operator for 523.1 this could be slow
+Computing Hecke operator for 523.2 this could be slow
+Computing Hecke operator for 529.1 this could be slow
+Computing Hecke operator for 541.1 this could be slow
+Computing Hecke operator for 541.2 this could be slow
+Computing Hecke operator for 547.1 this could be slow
+Computing Hecke operator for 547.2 this could be slow
+Computing Hecke operator for 571.1 this could be slow
+Computing Hecke operator for 571.2 this could be slow
+Computing Hecke operator for 577.2 this could be slow
+Computing Hecke operator for 577.1 this could be slow
+Computing Hecke operator for 601.1 this could be slow
+Computing Hecke operator for 601.2 this could be slow
+Computing Hecke operator for 607.2 this could be slow
+Computing Hecke operator for 607.1 this could be slow
+Computing Hecke operator for 613.2 this could be slow
+Computing Hecke operator for 613.1 this could be slow
+Computing Hecke operator for 619.1 this could be slow
+Computing Hecke operator for 619.2 this could be slow
+Computing Hecke operator for 631.1 this could be slow
+Computing Hecke operator for 631.2 this could be slow
+Computing Hecke operator for 643.2 this could be slow
+Computing Hecke operator for 643.1 this could be slow
+Computing Hecke operator for 661.1 this could be slow
+Computing Hecke operator for 661.2 this could be slow
+Computing Hecke operator for 673.2 this could be slow
+Computing Hecke operator for 673.1 this could be slow
+Computing Hecke operator for 691.1 this could be slow
+Computing Hecke operator for 691.2 this could be slow
+Computing Hecke operator for 709.1 this could be slow
+Computing Hecke operator for 709.2 this could be slow
+Computing Hecke operator for 727.2 this could be slow
+Computing Hecke operator for 727.1 this could be slow
+Computing Hecke operator for 733.1 this could be slow
+Computing Hecke operator for 733.2 this could be slow
+Computing Hecke operator for 739.2 this could be slow
+Computing Hecke operator for 739.1 this could be slow
+Computing Hecke operator for 751.2 this could be slow
+Computing Hecke operator for 751.1 this could be slow
+Computing Hecke operator for 757.1 this could be slow
+Computing Hecke operator for 757.2 this could be slow
+Computing Hecke operator for 769.1 this could be slow
+Computing Hecke operator for 769.2 this could be slow
+Computing Hecke operator for 787.2 this could be slow
+Computing Hecke operator for 787.1 this could be slow
+Computing Hecke operator for 811.1 this could be slow
+Computing Hecke operator for 811.2 this could be slow
+Computing Hecke operator for 823.2 this could be slow
+Computing Hecke operator for 823.1 this could be slow
+Computing Hecke operator for 829.2 this could be slow
+Computing Hecke operator for 829.1 this could be slow
+Computing Hecke operator for 841.1 this could be slow
+Computing Hecke operator for 853.2 this could be slow
+Computing Hecke operator for 853.1 this could be slow
+Computing Hecke operator for 859.1 this could be slow
+Computing Hecke operator for 859.2 this could be slow
+Computing Hecke operator for 877.2 this could be slow
+Computing Hecke operator for 877.1 this could be slow
+Computing Hecke operator for 883.1 this could be slow
+Computing Hecke operator for 883.2 this could be slow
+Computing Hecke operator for 907.1 this could be slow
+Computing Hecke operator for 907.2 this could be slow
+Computing Hecke operator for 919.1 this could be slow
+Computing Hecke operator for 919.2 this could be slow
+Computing Hecke operator for 937.1 this could be slow
+Computing Hecke operator for 937.2 this could be slow
+Computing Hecke operator for 967.2 this could be slow
+Computing Hecke operator for 967.1 this could be slow
+Computing Hecke operator for 991.2 this could be slow
+Computing Hecke operator for 991.1 this could be slow
+Computing Hecke operator for 997.1 this could be slow
+Computing Hecke operator for 997.2 this could be slow
+[ 9, 5, 12, 5, 10, 10, 4, 9, 6, 9, 0, 14, 5, 10, 4, 0, 14, 16, 9, 15, 7, 5, 8, 
+16, 9, 13, 12, 13, 6, 12, 13, 12, 14, 3, 15, 0, 9, 11, 13, 2, 11, 8, 2, 11, 16, 
+2, 13, 13, 16, 0, 5, 12, 9, 2, 1, 2, 13, 0, 0, 0, 4, 5, 8, 13, 0, 0, 14, 15, 4, 
+11, 0, 1, 4, 6, 16, 3, 11, 14, 12, 7, 7, 13, 0, 13, 9, 16, 16, 9, 7, 10, 1, 6, 
+0, 16, 4, 9, 4, 9, 0, 16, 2, 13, 4, 1, 2, 1, 3, 5, 0, 15, 3, 3, 4, 4, 15, 14, 
+15, 7, 0, 6, 13, 8, 2, 2, 0, 10, 7, 0, 5, 13, 16, 3, 3, 3, 7, 8, 14, 7, 9, 14, 
+0, 6, 10, 6, 13, 10, 5, 0, 4, 2, 14, 16, 13, 10, 1, 0, 11, 12, 16, 0, 3, 6, 0, 
+1, 11 ]
+Level raise factors are [ 31.2, 61.1, 151.2, 223.2, 283.1, 283.2, 307.1, 331.2, 
+337.1, 367.2, 433.2, 499.2, 547.1, 613.1, 673.1, 727.1, 733.2, 823.1, 859.1, 
+919.1, 967.1, 991.2, 277.1, 289.1 ]
+Level generated by 7*Kgen - 19
+where Kgen satisfies x^2 - x + 1
+Factors are [ 31.2, 61.1, 151.2, 223.2, 283.1, 283.2, 307.1, 331.2, 337.1, 
+367.2, 433.2, 499.2, 547.1, 613.1, 673.1, 727.1, 733.2, 823.1, 859.1, 919.1, 
+967.1, 991.2, 277.1, 289.1 ]
+Looking for lifts with level 31.2 = -Kgen + 6
+added; new level is 8587.3
+Characteristic 0 space empty
+---
+
+Looking for lifts with level 61.1 = 4*Kgen - 9
+added; new level is 16897.1
+Testing eigenform 1
+---
+
+Looking for lifts with level 151.2 = 5*Kgen - 14
+added; new level is 41827.3
+Characteristic 0 space empty
+---
+
+Looking for lifts with level 223.2 = 6*Kgen - 17
+added; new level is 61771.3
+Characteristic 0 space empty
+---
+
+Looking for lifts with level 283.1 = 6*Kgen - 19
+added; new level is 78391.1
+Testing eigenform 1
+---
+
+Looking for lifts with level 283.2 = 13*Kgen - 19
+added; new level is 78391.2
+---
+
+Looking for lifts with level 307.1 = 17*Kgen - 18
+added; new level is 85039.1
+Characteristic 0 space empty
+---
+
+Looking for lifts with level 331.2 = 11*Kgen - 21
+added; new level is 91687.2
+Characteristic 0 space empty
+---
+
+Looking for lifts with level 337.1 = 13*Kgen - 21
+added; new level is 93349.1
+Characteristic 0 space empty
+---
+
+Skipping level 367.2 since norm is less than norm bound = 100000
+Skipping level 433.2 since norm is less than norm bound = 100000
+Skipping level 499.2 since norm is less than norm bound = 100000
+Skipping level 547.1 since norm is less than norm bound = 100000
+Skipping level 613.1 since norm is less than norm bound = 100000
+Skipping level 673.1 since norm is less than norm bound = 100000
+Skipping level 727.1 since norm is less than norm bound = 100000
+Skipping level 733.2 since norm is less than norm bound = 100000
+Skipping level 823.1 since norm is less than norm bound = 100000
+Skipping level 859.1 since norm is less than norm bound = 100000
+Skipping level 919.1 since norm is less than norm bound = 100000
+Skipping level 967.1 since norm is less than norm bound = 100000
+Skipping level 991.2 since norm is less than norm bound = 100000
+Looking for lifts with level 277.1 = 7*Kgen - 19
+added; new level is 76729.1
+Characteristic 0 space empty
+---
+
+Looking for lifts with level 289.1 = 17
+added; new level is 80053.1
+---
+
+None found
+
+Total time: 106463.979 seconds, Total memory usage: 7483.47MB
+106393.38user 70.69system 29:34:26elapsed 99%CPU (0avgtext+0avgdata 7681396maxresident)k
+896inputs+1456outputs (0major+53682027minor)pagefaults 0swaps
