@@ -10,7 +10,7 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
     
     F:=QuadFld(d);
     ZF:=MaximalOrder(F);
-    filename := "data/nonEis_d" cat Sprint(d) cat ".csv";
+    filename := "data/nonEis_d" cat Sprint(d) cat "_" cat Sprint(levelLowerBd) cat "_" cat Sprint(levelUpperBd) cat ".csv";
     // bd := 100;
     labels := [LMFDBLabel(pp) : pp in SortByLMFDBLabel(PrimesUpTo(heckeBd, F)) ];
 
