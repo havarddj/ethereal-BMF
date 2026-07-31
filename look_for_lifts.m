@@ -605,7 +605,7 @@ function VerifyLMFDBLift(d,str : zealous := false)
 		level_raise_space := sub<B2`forms | [B2`down(ff`Zvector) : ff in level_raise_f]>;
 
 		red := ReductionModPMap(B3, B2);
-		red_forms := sub<B2`forms | [B2`down(red(B3`Z.i)) : i in [1..Dimension(B3`Z)]]>;
+		red_forms := CharacteristicZeroImage(B2,B3);
 
 		lb := Dimension(level_raise_space meet red_forms) ge 1;
 
