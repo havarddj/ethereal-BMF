@@ -168,7 +168,7 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
     with open(input_file) as f:
         csv_reader = csv.reader(f, delimiter=';')
 
-        prime_labels = next(csv_reader)[2:-2]
+        prime_labels = next(csv_reader)[2:-1]
             
         for row in csv_reader:
             if row == []:
