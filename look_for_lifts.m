@@ -562,6 +562,28 @@ function UnpackLiftableString(lmfdbstr)
 	return levelLabel,p,eigs,liftlabels;
 end function;
 
+
+// turns a line from d*_liftable.csv into its BMFCohomClass
+function LoadFormFromData(d,str)
+	K := QuadFld(d);
+	levelLabel,p,eigs,liftLabels := UnpackLiftableString(str);
+	level := LMFDBIdeal(K, levelLabel);
+	W := BianchiWeight(K, 0, 0 : char := p);
+	B := BianchiCohomologySpace(level, W);
+
+	s := Split(Read("data/nonEis_d" cat Sprint(d) cat ".csv"),"\n")[1];
+	// this cuts out just the part of the string with the labels 
+	pp := s[9..#s-14];
+	PP := [LMFDBIdeal(K,u) : u in Split(pp,";")];
+
+	// this feels quite silly, having to re-egineer the string.
+	fstr := levelLabel cat ";" cat Sprint(p) cat ";" cat &cat[Sprint(u) cat ";" : u in eigs];
+	f := ReadClass(fstr,B,PP);
+	return f;
+end function;
+
+
+
 // tries to verify a probable lift from LMFDB data via cocycles. `zealous` option 
 // checks all of them, rather than quitting once one has been found.
 function VerifyLMFDBLift(d,str : zealous := false)
@@ -626,6 +648,65 @@ function VerifyLMFDBLift(d,str : zealous := false)
 	end if;
 
 end function;
+
+
+// checks part 2 of the conjecture for the forms in d*_liftable.csv
+procedure CheckConjecture2(d : verbose := false)
+	assert d in {1,2,3,7,11};
+	rr := Read("sage/d" cat Sprint(d) cat "_liftable.csv");
+	rr := Split(rr,"\n");
+
+	// this skips the level 1 mod 2 system over Q(-11), which takes a very long time
+	start := 2;
+	if d eq 11 then 
+		start := 3;
+	end if;
+
+	for i in [start..#rr] do 
+		form_data := rr[i];
+		print Split(form_data,";")[1..2];
+		f := LoadFormFromData(d,form_data);
+		K := Parent(f)`field;
+		// we gather the ideals where f lifts 
+		levelLabel,p,eigs,liftLabels := UnpackLiftableString(form_data);
+		
+		level := LMFDBIdeal(K,levelLabel);
+
+		lift_ideals := [LMFDBIdeal(K,u) : u in liftLabels];
+
+		for ll in lift_ideals do 
+			if verbose then 
+				printf "Checking Conjecture (2) on level %o\n", LMFDBLabel(ll);
+			end if;
+			Q := ll/level;
+			PP := [f[1] : f in Factorization(Q)];
+			satisfies := true;
+			for P in PP do 
+				eig := Eigenvalue(f,P);
+				sat := (eig^2 - (1+Norm(P))^2) eq 0 or level*p subset P;
+				if not sat then 
+					if not verbose then
+						printf "Problem occurs at level %o, prime label %o\n", LMFDBLabel(ll), LMFDBLabel(P);
+					else 
+						printf "Problem occurs prime label %o\n", LMFDBLabel(P);
+					end if;
+					printf "a_P^2 - (1+N(P))^2 = %o\n", eig^2 - (1+Norm(P))^2;
+					printf "Prime divides frak(n)*p: %o\n", level*p subset P;
+					printf "Valuation of P in level raise factor: %o\n", Valuation(ll/level,P);
+					printf "\n";
+				end if;
+				satisfies and:= sat;
+			end for;
+			if verbose then 
+				printf "All primes in lift factor satisfy Conjecture (2): %o\n\n", satisfies;
+			end if;
+		end for;
+		if verbose then 
+			print "";
+		end if;
+	end for;
+end procedure;
+
 
 
 function CheckEtheralData()
