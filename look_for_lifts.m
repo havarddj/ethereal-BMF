@@ -691,7 +691,9 @@ procedure CheckConjecture2(d : verbose := false)
 						printf "Problem occurs prime label %o\n", LMFDBLabel(P);
 					end if;
 					printf "a_P^2 - (1+N(P))^2 = %o\n", eig^2 - (1+Norm(P))^2;
-					printf "Prime divides frak(n)*p: %o\n\n", level*p subset P;
+					printf "Prime divides frak(n)*p: %o\n", level*p subset P;
+					printf "Valuation of P in level raise factor: %o\n", Valuation(ll/level,P);
+					printf "\n";
 				end if;
 				satisfies and:= sat;
 			end for;
