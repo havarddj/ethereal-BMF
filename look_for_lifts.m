@@ -656,7 +656,13 @@ procedure CheckConjecture2(d : verbose := false)
 	rr := Read("sage/d" cat Sprint(d) cat "_liftable.csv");
 	rr := Split(rr,"\n");
 
-	for i in [2..#rr] do 
+	// this skips the level 1 mod 2 system over Q(-11), which takes a very long time
+	start := 2;
+	if d eq 11 then 
+		start := 3;
+	end if;
+
+	for i in [start..#rr] do 
 		form_data := rr[i];
 		print Split(form_data,";")[1..2];
 		f := LoadFormFromData(d,form_data);
@@ -685,12 +691,12 @@ procedure CheckConjecture2(d : verbose := false)
 						printf "Problem occurs prime label %o\n", LMFDBLabel(P);
 					end if;
 					printf "a_P^2 - (1+N(P))^2 = %o\n", eig^2 - (1+Norm(P))^2;
-					printf "Prime divides frak(n)*p: %o\n", level*p subset P;
+					printf "Prime divides frak(n)*p: %o\n\n", level*p subset P;
 				end if;
 				satisfies and:= sat;
 			end for;
 			if verbose then 
-				printf "All primes in lift factor satisfy Conjecture (2): %o\n", satisfies;
+				printf "All primes in lift factor satisfy Conjecture (2): %o\n\n", satisfies;
 			end if;
 		end for;
 		if verbose then 

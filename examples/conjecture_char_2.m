@@ -54,7 +54,7 @@ end if;
 
 P := LMFDBIdeal(K,"11.1");
 aP := Eigenvalue(f,P);
-printf "Eigenvalue of f at ideal with label %o: %o", LMFDBLabel(P), aP;
+printf "Eigenvalue of f at ideal with label %o: %o\n", LMFDBLabel(P), aP;
 printf "a_P^2 - (1+N(P))^2 = %o\n", (aP^2 - (1+Norm(P))^2);
 printf "P is a divisor of level*p? %o\n", level1*p subset P;
 
