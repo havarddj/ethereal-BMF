@@ -35,7 +35,7 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlLowerBd := 0, lvlBd := 1000000 , at_p := false, includeLvl := false)
+function FindLifts(f : lvlLowerBd := 0, lvlBd := 1000000 , at_p := false)
     LR_nums := LevelRaiseFactors(f, Min(Floor(lvlBd/Norm(Level(f))), 4000));
     // LR_nums := LevelRaisingPrimes(f);
     // LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
@@ -67,11 +67,6 @@ function FindLifts(f : lvlLowerBd := 0, lvlBd := 1000000 , at_p := false, includ
 	LR_nums := SortByLMFDBLabel(LR_nums);
     end if;
     
-    if includeLvl then
-	Append(~LR_nums, 1*ZK);
-	LR_nums := SortByLMFDBLabel(LR_nums);
-    end if;
-
     HeckeField := HeckeField(f);
     
     // Caching is supposed to speed this up by storing oldspaces
@@ -102,7 +97,20 @@ function FindLifts(f : lvlLowerBd := 0, lvlBd := 1000000 , at_p := false, includ
 	C := BianchiCuspForms(K, level2);
 	if Dimension(C) eq 0 then
 	    print "Characteristic 0 space empty";
+	    continue;
 	end if;
+	// Test small Hecke operator:
+	qq1 := primes[1];
+	ev1 := Eigenvalue(f,qq1);
+	Phi := MinimalPolynomial(HeckeOperator(C,qq1));
+	
+	if Evaluate(ChangeRing(Phi, Parent(ev1)), ev1) ne 0 then
+	    print "Eigenvalue of", LMFDBLabel(qq1), "is not a root of char 0 Hecke polynomial; evaluates to", Evaluate(ChangeRing(Phi, Parent(ev1)), ev1);
+	    continue;
+	else
+	    print "Eigenvalue of", LMFDBLabel(qq1), "is a root of char 0 Hecke polynomial --- computing newform decomposition.";
+	end if;
+	
 	print "Computing eigenforms, this may take time";
 	
 	for j -> F in NewformDecomposition(NewSubspace(C)) do
@@ -329,6 +337,7 @@ function CheckNonrationalLift(d, line, topLine: extended := false)
     
 end function;
 
+// Degree 6 Hecke field example
 function CheckNR1()
     line := "281.2;5;[ 2, 1 ];[ 2, 3 ];[ 2, 2 ];[ 2, 1 ];[ 2, 0 ];[ 1, 0 ];[ 3, 1 ];[ 4, 3 ];0;[ 4, 1 ];[ 0, 2 ];[ 0, 0 ];[ 3, 0 ];[ 2, 0 ];[ 0, 1 ];[ 3, 3 ];[ 4, 2 ];[ 0, 1 ];[ 0, 3 ];[ 4, 3 ];[ 0, 1 ];[ 1, 3 ];[ 1, 0 ];x^2 + 4*x + 2";
     topLine := "level;p;2.1;2.2;7.1;9.1;11.1;11.2;23.1;23.2;25.1;29.1;29.2;37.1;37.2;43.1;43.2;53.1;53.2;67.1;67.2;71.1;71.2;79.1;79.2";
@@ -360,12 +369,13 @@ function CheckCubicNonrationalLift()
     d := 11;
     F := QuadFld(d);
     p := 3;
-    bound := 250;
+    bound := 150;
     B := BianchiCohomologySpace(LMFDBIdeal(F, "265.1"), BianchiWeight(F,0,0 : char := p));
     // B := BianchiCohomologySpace(LMFDBIdeal(F, "355.1"), BianchiWeight(F,0,0 : char := p));
     SetHeckeBound(B, bound);
+    print "Computing eigenforms with Hecke bound", bound;
     for f in Eigenforms(B) do
-	FindLifts(f : lvlBd := bound, at_p := true);
+	FindLifts(f);
     end for;
     return "cope";
 
@@ -401,7 +411,7 @@ function CheckLiftableD2()
     B := BianchiCohomologySpace(LMFDBIdeal(F, "97.1"), BianchiWeight(F,0,0 : char := p));
     
     f := ReadClass(line, B, [LMFDBIdeal(F, I) : I in primeList]);
-    return FindLifts(f : lvlBd := 200);
+    return FindLifts(f);
 end function;
 
 // Look for lifts which sage couldn't find in the lmfdb
@@ -489,13 +499,13 @@ function CheckDouchebag()
     lifts := [* *];
     for f in Eigenforms(B) do
 	print "Eigenvalues:", PrintEigenvalues(f : bd := bound);
-	Append(~lifts, <f, FindLifts(f : at_p := true, includeLvl := false)>);
+	Append(~lifts, <f, FindLifts(f)>);
     end for;
     return lifts;
 
 end function;
 
-function CheckDouchebag2( : recompute:=false, bound := 100)
+function CheckDouchebag2( : recompute:=false, bound := 200)
     // This one has small level so it shouldn't be that hard to find lift
     d := 3;
     F := QuadFld(d);
@@ -521,7 +531,7 @@ function CheckDouchebag2( : recompute:=false, bound := 100)
 
     end if;
     
-    lift := FindLifts(f : at_p := false, includeLvl := false);
+    lift := FindLifts(f : at_p := false);
     return lift;
 end function;
 
@@ -530,7 +540,7 @@ function CheckDouchebag3()
     d := 11;
     F := QuadFld(d);
     p := 17;
-    bound := 100;
+    bound := 200;
     B := BianchiCohomologySpace(LMFDBIdeal(F, "69.2"), BianchiWeight(F,0,0 : char := p));
     print "Initialized", B;
     SetHeckeBound(B, bound);
@@ -538,7 +548,7 @@ function CheckDouchebag3()
     lifts := [* *];
     for f in Eigenforms(B) do
 	print "Eigenvalues:", EigenvalueList(f);
-	Append(~lifts, <f, FindLifts(f : lvlBd := 5000, at_p := false, includeLvl := false)>);
+	Append(~lifts, <f, FindLifts(f)>);
     end for;
     return lifts;
 
