@@ -35,8 +35,8 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlLowerBd := 0, lvlBd := 1000000 , at_p := false)
-    LR_nums := LevelRaiseFactors(f, Min(Floor(lvlBd/Norm(Level(f))), 4000));
+function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false)
+    LR_nums := LevelRaiseFactors(f, Min(Floor(lvlUpperBd/Norm(Level(f))), 4000));
     // LR_nums := LevelRaisingPrimes(f);
     // LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
 
@@ -75,8 +75,8 @@ function FindLifts(f : lvlLowerBd := 0, lvlBd := 1000000 , at_p := false)
     // print "Factors are", [LMFDBLabel(I) : I in LR_nums];
     for I in LR_nums do
 	level2 := I*level1;
-	if Norm(level2) gt lvlBd or Norm(level2) lt lvlLowerBd then
-	    print "Skipping level", LMFDBLabel(I), "since not in range specified by lvlLowerBd and lvlBd";
+	if Norm(level2) gt lvlUpperBd or Norm(level2) lt lvlLowerBd then
+	    print "Skipping level", LMFDBLabel(I), "since not in range specified by lvlLowerBd and lvlUpperBd";
 	    continue;
 	end if;
 	_, princ := IsPrincipal(I);
@@ -187,7 +187,7 @@ function FindLifts(f : lvlLowerBd := 0, lvlBd := 1000000 , at_p := false)
 			    wrong_ctr +:= 1;
 			    print "Hecke eigenvalues don't agree for", LMFDBLabel(qq);
 			    
-			    if wrong_ctr gt 5 then
+			    if wrong_ctr gt 3 then
 				is_wrong := true;
 				wrong_ctr := 0;
 				print "Eigenvalues didn't match, moving to next";
@@ -206,7 +206,9 @@ function FindLifts(f : lvlLowerBd := 0, lvlBd := 1000000 , at_p := false)
 			Fp_evals := ["$a_{\\mathfrak{p}}(F) \\mod p$"] cat ListToEquationStrings([phi(HeckeEigenvalue(Eigenform(F),pp)) : pp in primes[1..colNum]]); 
 			F_evals := ["$a_{\\mathfrak{p}}(F)$"] cat ListToEquationStrings([HeckeEigenvalue(Eigenform(F),pp) : pp in primes[1..colNum]]);
 			print ListsToLatexTable([labels,fp_evals,Fp_evals, F_evals]);
-			return F;
+			return [LMFDBLabel(Level(F)) ] cat
+			 [Sprint(Eltseq(HeckeEigenvalue(Eigenform(F), pp))) : pp in primes] cat
+			 [Sprint(DefiningPolynomial(E))];
 		    end if;
 
 		end for;
@@ -233,7 +235,7 @@ where
 - the rest of the entries correspond to Hecke eigenvalues
 */
 
-function BatchFindIrrationalLifts(d : lvlBd := 100)
+function BatchFindIrrationalLifts(d : lvlUpperBd := 100)
     F := QuadFld(d);
     filename := "data/nonEis_d" cat Sprint(d) cat ".csv";
     lines := Split(Read(filename), "\n");
@@ -255,7 +257,7 @@ function BatchFindIrrationalLifts(d : lvlBd := 100)
 	B := BianchiCohomologySpace(lvl, BianchiWeight(F,0,0 : char :=p));
 	f := ReadClass(line, B, primeList);
 	print "Finding lifts for", f, "; this may take time";
-	f0 := FindLifts(f : lvlBd := lvlBd, at_p := true);
+	f0 := FindLifts(f : lvlUpperBd := lvlUpperBd, at_p := true);
 	if Type(f0) eq Type("Foo") then
 	    print f0;
 	    // print "++++FOUND LIFT++++", f0;
@@ -312,21 +314,37 @@ function CanKillLiftingObstr(p, I,J)
     end if;
 end function;
 
-function CheckNonrationalLift(d, line, topLine: extended := false)
+function CheckNonrationalLift(d, line, topLine : extended := false, lvlLowerBd :=0, lvlUpperBd := 0, recompute := false, HeckeBd := 200)
     F := QuadFld(d);
     lvl := Split(line, ";")[1];
     topList := Split(topLine, ";");
-    primeList := topList[3..#topList];
+    primeList := topList[3..#topList-1];
     p := StringToInteger(Split(line, ";")[2]);
     B := BianchiCohomologySpace(LMFDBIdeal(F, lvl), BianchiWeight(F,0,0 : char := p));
+    
     print "Initializing class from line";
+
     f := ReadClass(line, B, [LMFDBIdeal(F, I) : I in primeList]);
     print "Initialized class; looking for lifts";
+    if recompute then
+	print "Recomputing Hecke eigenvalues with Hecke bound", HeckeBd;
+	SetHeckeBound(B, HeckeBd);
+	ComputeHeckeOperators(B);
+	// extract correct recomputed eigenform
+	// necessary because f doesn't have a vector (iirc)
+	for f2 in Eigenforms(B) do
+	    if forall{pp : pp in GoodHeckePrimes(B, 50) | MinimalPolynomial(Eigenvalue(f,pp)) eq MinimalPolynomial(Eigenvalue(f2,pp))}  then
+		f := f2;
+		print "Identified recomputed eigenform!";
+		break;
+	    end if;
+	end for;
+    end if;
     if not extended then
-	return FindLifts(f);
+	return FindLifts(f : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd);
     end if;
     
-    fLift := FindLifts(f);
+    fLift := FindLifts(f : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd);
 
     newLvl := Level(fLift);
     B := BianchiCohomologySpace(newLvl, BianchiWeight(BaseField(fLift),0,0 : char := p));
@@ -415,24 +433,57 @@ function CheckLiftableD2()
 end function;
 
 // Look for lifts which sage couldn't find in the lmfdb
-function LookForLMFDBUnliftable(d)
-    input := "data/lmfdbNonLift_d" cat Sprint(d) cat ".csv";
+
+/*
+The main idea is to do various passes with different interals
+specified by lvlLowerBd and lvlUpperBd. For high levels, it might be a
+good idea to set recompute := true, since by default, we only store
+eigenvalues up to norm 100.
+
+The output is stored in "./data/irrat_lifts_dX.csv". If no lift is found, it will write the output from FindLifts, telling you if the problem was that no lifts were found, or if there were no level raising primes. 
+*/
+function LookForLMFDBUnliftable(d : lvlLowerBd :=0, lvlUpperBd := 10000, recompute := false)
+    input := "data/lmfdbNonlift_d" cat Sprint(d) cat ".csv";
     output := "data/irrat_lifts_d" cat Sprint(d) cat ".csv";
     lines := Split(Read(input), "\n");
     topLine := lines[1];
-    results := [* *];
+    topElts := Split(topLine, ";");
+    if Read(output) eq "" then 
+	fprintf output, "level; prime; lift level;" cat Join(topElts[3..#topElts], ";") cat "\n";
+    end if;
+    
+    // Helper function 
+    HasFoundLift := function(line, output)
+	existingLines := Split(Read(output), "\n");
+	lvl := Split(line, ";")[1];
+	p := Split(line, ";")[2];
+	for exLine in existingLines do
+	    if Split(exLine, ";")[1] eq lvl and Split(exLine, ";")[2] eq p then
+		print "A lift was already found, skipping";
+		return "level raising" in exLine or "None found" in exLine;
+	    end if;
+	end for;
+	return false;
+    end function;
     for line in lines[2..#lines] do
-	print "Looking for lifts of line", line;
-	res := CheckNonrationalLift(d, line, topLine);
-	id := Split(line, ";")[1] cat ";" cat Split(line, ";")[2] cat ";";
-	// if Sprint(res) eq "None found" then
-	fprintf output, id cat Sprint(res) cat "\n";
-	    // else
-	    // fprintf output, id cat Sprint(res);
-	// end if;
+	if HasFoundLift(line, output) then
+	    continue;
+	end if;
 	
+	print "Looking for lifts of line", line;
+	res := CheckNonrationalLift(d, line, topLine : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd, recompute := recompute);
+	
+	if Type(res) eq SeqEnum then
+	    resultLine := Join(res, ";") ;
+	else
+	    resultLine := Sprint(res);
+	end if;
+	lvl := Split(line, ";")[1];
+	prime := Split(line, ";")[2];
+	fprintf output, lvl cat ";" cat prime cat ";" cat resultLine cat "\n";
     end for;
-    return results;
+
+    return true;
 end function;
 
 function LookForAllIrrational(d)
@@ -481,7 +532,7 @@ function CheckNonLR()
     print "Computing eigenforms with Hecke bound", bound;
     lifts := [* *];
     for f in Eigenforms(B) do
-	Append(~lifts, <f, FindLifts(f : lvlBd := bound, at_p := true)>);
+	Append(~lifts, <f, FindLifts(f : lvlUpperBd := bound, at_p := true)>);
     end for;
     return lifts;
 end function;

@@ -317,10 +317,10 @@ def ul_filter_csv(d):
         # add top line
         lines.append(";".join(next(csv_reader)))
         for row in csv_reader:
-            if row == [] or any(['x' in r for r in row]):
+            if row == []:
                 continue
             p = eval(row[1])
-            if any([row[0] == h.level_label() and p == h.p() for h in modp_evs]):
+            if any([row[0] == h.level_label() and p == h.p() for h in modp_evs]) or any(["[" in r for r in row]):
                 lines.append(";".join(row))
         
     with open(output_file, "w") as f:
