@@ -482,7 +482,12 @@ function LookForLMFDBUnliftable(d : lvlLowerBd :=0, lvlUpperBd := 10000, recompu
 	end if;
 	lvl := Split(line, ";")[1];
 	prime := Split(line, ";")[2];
-	fprintf output, lvl cat ";" cat prime cat ";" cat resultLine cat "\n";
+	resultLine := lvl cat ";" cat prime cat ";" cat resultLine cat "\n";
+	if resultLine not in Read(output) then
+	    print "Result already stored, moving on";
+	    fprintf output, resultLine;
+	end if;
+	print "\n\n";
     end for;
 
     return true;
