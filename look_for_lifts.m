@@ -459,14 +459,14 @@ function LookForLMFDBUnliftable(d : lvlLowerBd :=0, lvlUpperBd := 10000, recompu
 	p := Split(line, ";")[2];
 	for exLine in existingLines do
 	    if Split(exLine, ";")[1] eq lvl and Split(exLine, ";")[2] eq p then
-		print "A lift was already found, skipping";
-		return "level raising" in exLine or "None found" in exLine;
+		return "level raising" notin exLine and "None found" notin exLine;
 	    end if;
 	end for;
 	return false;
     end function;
     for line in lines[2..#lines] do
 	if HasFoundLift(line, output) then
+	    print "A lift was already found";
 	    continue;
 	end if;
 	
