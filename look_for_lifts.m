@@ -35,7 +35,7 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, storeForms := false)
+function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, storeForms := true)
     LR_nums := LevelRaiseFactors(f, Min(Floor(lvlUpperBd/Norm(Level(f))), 4000));
     // LR_nums := LevelRaisingPrimes(f);
     // LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
@@ -315,13 +315,7 @@ function CanKillLiftingObstr(p, I,J)
     end if;
 end function;
 
-function CheckNonrationalLift(d, line, topLine : extended := false, lvlLowerBd :=0, lvlUpperBd := 0, recompute := false, HeckeBd := 200, cachedQuadFld := false)
-    if Type(cachedQuadFld) eq Bool then
-	F := QuadFld(d);
-    else
-	F := cachedQuadFld;
-    end if;
-    
+function CheckNonrationalLift(F, line, topLine : extended := false, lvlLowerBd :=0, lvlUpperBd := 10000, recompute := false, HeckeBd := 200)
     lvl := Split(line, ";")[1];
     topList := Split(topLine, ";");
     primeList := topList[3..#topList-1];
@@ -346,6 +340,7 @@ function CheckNonrationalLift(d, line, topLine : extended := false, lvlLowerBd :
 	    end if;
 	end for;
     end if;
+
     if not extended then
 	return FindLifts(f : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd);
     end if;
@@ -366,7 +361,7 @@ function CheckNR1()
     line := "281.2;5;[ 2, 1 ];[ 2, 3 ];[ 2, 2 ];[ 2, 1 ];[ 2, 0 ];[ 1, 0 ];[ 3, 1 ];[ 4, 3 ];0;[ 4, 1 ];[ 0, 2 ];[ 0, 0 ];[ 3, 0 ];[ 2, 0 ];[ 0, 1 ];[ 3, 3 ];[ 4, 2 ];[ 0, 1 ];[ 0, 3 ];[ 4, 3 ];[ 0, 1 ];[ 1, 3 ];[ 1, 0 ];x^2 + 4*x + 2";
     topLine := "level;p;2.1;2.2;7.1;9.1;11.1;11.2;23.1;23.2;25.1;29.1;29.2;37.1;37.2;43.1;43.2;53.1;53.2;67.1;67.2;71.1;71.2;79.1;79.2";
 
-    return CheckNonrationalLift(7, line, topLine : extended := true);
+    return CheckNonrationalLift(QuadFld(7), line, topLine : extended := true);
 end function;
     
 // Check that ethereal form with Fp^2 coefficients lifts to a form when adding 5.1 to the level.
@@ -374,7 +369,7 @@ function CheckNonrationalLiftFp2()
     line := "293.1;3;[ 1, 1 ];[ 2, 0 ];[ 0, 0 ];0;[ 2, 1 ];[ 2, 1 ];[ 0, 2 ];[ 2, 1 ];[ 0, 1 ];[ 2, 2 ];[ 1, 1 ];[ 0, 1 ];[ 2, 0 ];[ 2, 1 ];[ 0, 2 ];[ 0, 1 ];[ 1, 0 ];[2, 0 ];[ 2, 2 ];[ 0, 0 ];[ 0, 0 ];[ 0, 2 ];[ 2, 2 ];[ 1, 2 ];[ 2, 2 ];x^2 + 1";
     primeList := "level;p;2.1;5.1;5.2;9.1;13.1;13.2;17.1;17.2;29.1;29.2;37.1;37.2;41.1;41.2;49.1;53.1;53.2;61.1;61.2;73.1;73.2;89.1;89.2;97.1;97.2";
     
-    return CheckNonrationalLift(1, line, primeList);
+    return CheckNonrationalLift(QuadFld(1), line, primeList);
 end function;
 
 function CheckAnotherNonrationalLiftFp2()
@@ -478,7 +473,7 @@ function LookForLMFDBUnliftable(d : lvlLowerBd :=0, lvlUpperBd := 10000, recompu
 	end if;
 	
 	print "Looking for lifts of line", line;
-	res := CheckNonrationalLift(d, line, topLine : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd, recompute := recompute, cachedQuadFld := F);
+	res := CheckNonrationalLift(F, line, topLine : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd, recompute := recompute);
 	
 	if Type(res) eq SeqEnum then
 	    resultLine := Join(res, ";") ;
@@ -494,6 +489,7 @@ function LookForLMFDBUnliftable(d : lvlLowerBd :=0, lvlUpperBd := 10000, recompu
 end function;
 
 function LookForAllIrrational(d)
+    F := QuadFld(d);
     input := "data/nonEis_d" cat Sprint(d) cat ".csv";
     output := "data/irrat_lifts_d" cat Sprint(d) cat ".csv";
     lines := Split(Read(input), "\n");
@@ -510,7 +506,7 @@ function LookForAllIrrational(d)
 	end if;
 	print "Looking for lifts of id", id;
 	try 
-	    res := CheckNonrationalLift(d, line, topLine);
+	    res := CheckNonrationalLift(F, line, topLine);
 	catch err
 	    print "Failed to initalize class with error", err;
 	    continue line;
