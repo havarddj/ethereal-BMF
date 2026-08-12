@@ -35,7 +35,7 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false)
+function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, storeForms := false)
     LR_nums := LevelRaiseFactors(f, Min(Floor(lvlUpperBd/Norm(Level(f))), 4000));
     // LR_nums := LevelRaisingPrimes(f);
     // LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
@@ -69,9 +69,10 @@ function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false)
     
     HeckeField := HeckeField(f);
     
-    // Caching is supposed to speed this up by storing oldspaces
+    // Caching is supposed to speed this up by storing eigenforms
     // see https://magma.maths.usyd.edu.au/magma/handbook/text/1784#20376
-    SetStoreModularForms(K, true);
+    // The main utility of this is when you're accessing the same space several times.
+    SetStoreModularForms(K, storeForms);
     // print "Factors are", [LMFDBLabel(I) : I in LR_nums];
     for I in LR_nums do
 	level2 := I*level1;
@@ -314,8 +315,13 @@ function CanKillLiftingObstr(p, I,J)
     end if;
 end function;
 
-function CheckNonrationalLift(d, line, topLine : extended := false, lvlLowerBd :=0, lvlUpperBd := 0, recompute := false, HeckeBd := 200)
-    F := QuadFld(d);
+function CheckNonrationalLift(d, line, topLine : extended := false, lvlLowerBd :=0, lvlUpperBd := 0, recompute := false, HeckeBd := 200, cachedQuadFld := false)
+    if Type(cachedQuadFld) eq Bool then
+	F := QuadFld(d);
+    else
+	F := cachedQuadFld;
+    end if;
+    
     lvl := Split(line, ";")[1];
     topList := Split(topLine, ";");
     primeList := topList[3..#topList-1];
@@ -443,6 +449,7 @@ eigenvalues up to norm 100.
 The output is stored in "./data/irrat_lifts_dX.csv". If no lift is found, it will write the output from FindLifts, telling you if the problem was that no lifts were found, or if there were no level raising primes. 
 */
 function LookForLMFDBUnliftable(d : lvlLowerBd :=0, lvlUpperBd := 10000, recompute := false)
+    F := QuadFld(d);		// NB: Caching this lets us cache char 0 eigenforms.
     input := "data/lmfdbNonlift_d" cat Sprint(d) cat ".csv";
     output := "data/irrat_lifts_d" cat Sprint(d) cat ".csv";
     lines := Split(Read(input), "\n");
@@ -471,7 +478,7 @@ function LookForLMFDBUnliftable(d : lvlLowerBd :=0, lvlUpperBd := 10000, recompu
 	end if;
 	
 	print "Looking for lifts of line", line;
-	res := CheckNonrationalLift(d, line, topLine : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd, recompute := recompute);
+	res := CheckNonrationalLift(d, line, topLine : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd, recompute := recompute, cachedQuadFld := F);
 	
 	if Type(res) eq SeqEnum then
 	    resultLine := Join(res, ";") ;
