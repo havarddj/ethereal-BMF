@@ -633,7 +633,7 @@ end function;
 
 
 // turns a line from d*_liftable.csv into its BMFCohomClass
-function LoadFormFromData(d,str)
+function LoadForm_liftable(d,str)
 	K := QuadFld(d);
 	levelLabel,p,eigs,liftLabels := UnpackLiftableString(str);
 	level := LMFDBIdeal(K, levelLabel);
@@ -650,6 +650,20 @@ function LoadFormFromData(d,str)
 	f := ReadClass(fstr,B,PP);
 	return f;
 end function;
+
+
+// turns a line from nonEis_d*.csv into its BMFCohomClass
+function LoadForm_nonEis(d,str)
+	K := QuadFld(d);
+	ss := Split(str,";");
+	ll := ss[1] cat ";" cat ss[2] cat ";[";
+	for v in ss[3..#ss-2] do
+		ll cat:= v cat ",";
+	end for;
+	ll cat:= ss[#ss-1] cat "];[]";
+	return LoadForm_liftable(d,ll);
+end function;
+
 
 
 
@@ -734,7 +748,7 @@ procedure CheckConjecture2(d : verbose := false)
 	for i in [start..#rr] do 
 		form_data := rr[i];
 		print Split(form_data,";")[1..2];
-		f := LoadFormFromData(d,form_data);
+		f := LoadForm_liftable(d,form_data);
 		K := Parent(f)`field;
 		// we gather the ideals where f lifts 
 		levelLabel,p,eigs,liftLabels := UnpackLiftableString(form_data);
