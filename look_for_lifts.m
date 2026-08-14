@@ -480,7 +480,7 @@ function LookForLMFDBUnliftable(d : liftLvlLowerBd :=0, liftLvlUpperBd := 10000,
 	end if;
 	
 	print "Looking for lifts of line", line;
-	res := CheckNonrationalLift(F, line, topLine : lvlLowerBd := liftLvlLowerBd, lvlUpperBd := lftLvlUpperBd, recompute := recompute);
+	res := CheckNonrationalLift(F, line, topLine : lvlLowerBd := liftLvlLowerBd, lvlUpperBd := liftLvlUpperBd, recompute := recompute);
 	
 	if Type(res) eq SeqEnum then
 	    resultLine := Join(res, ";") ;
