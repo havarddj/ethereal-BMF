@@ -443,7 +443,7 @@ eigenvalues up to norm 100.
 
 The output is stored in "./data/irrat_lifts_dX.csv". If no lift is found, it will write the output from FindLifts, telling you if the problem was that no lifts were found, or if there were no level raising primes. 
 */
-function LookForLMFDBUnliftable(d : lvlLowerBd :=0, lvlUpperBd := 10000, recompute := false)
+function LookForLMFDBUnliftable(d : liftLvlLowerBd :=0, liftLvlUpperBd := 10000, recompute := false, lvlMin := 0, lvlMax := 1000)
     F := QuadFld(d);		// NB: Caching this lets us cache char 0 eigenforms.
     input := "data/lmfdbNonlift_d" cat Sprint(d) cat ".csv";
     output := "data/irrat_lifts_d" cat Sprint(d) cat ".csv";
@@ -467,20 +467,26 @@ function LookForLMFDBUnliftable(d : lvlLowerBd :=0, lvlUpperBd := 10000, recompu
 	return false;
     end function;
     for line in lines[2..#lines] do
+	lvl := Split(line, ";")[1];
+	Nm := Norm(LMFDBIdeal(F,lvl));
+
+	if lvlMin gt Nm or lvlMax lt Nm then
+	    continue;
+	end if;
+	
 	if HasFoundLift(line, output) then
 	    print "A lift was already found";
 	    continue;
 	end if;
 	
 	print "Looking for lifts of line", line;
-	res := CheckNonrationalLift(F, line, topLine : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd, recompute := recompute);
+	res := CheckNonrationalLift(F, line, topLine : lvlLowerBd := liftLvlLowerBd, lvlUpperBd := lftLvlUpperBd, recompute := recompute);
 	
 	if Type(res) eq SeqEnum then
 	    resultLine := Join(res, ";") ;
 	else
 	    resultLine := Sprint(res);
 	end if;
-	lvl := Split(line, ";")[1];
 	prime := Split(line, ";")[2];
 	resultLine := lvl cat ";" cat prime cat ";" cat resultLine cat "\n";
 	if resultLine notin Read(output) then
