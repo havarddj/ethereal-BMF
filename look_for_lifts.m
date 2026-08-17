@@ -739,6 +739,30 @@ function VerifyLMFDBLift(d,str : zealous := false)
 end function;
 
 
+procedure VerifyLift(d,linenum)
+	if linenum eq 1 then
+		print "Table heading contained on line 1, no form to lift";
+	end if;
+	K := QuadFld(d);
+	ZK := MaximalOrder(K);
+	rr := Read("sage/d" cat Sprint(d) cat "_liftable.csv");
+	lines := Split(rr);
+	filename := "data/verified_d" cat Sprint(d) cat "_" cat Sprint(linenum) cat ".csv";
+	SetColumns(0);
+
+	str := lines[linenum];
+	levelLabel, p, eigs := Explode(Split(str,";"));
+	tt, liftLabel := VerifyLMFDBLift(d,str);
+	if tt then 
+		outstr := levelLabel cat ";" cat p cat ";" cat liftLabel cat ";" cat eigs;
+		Write(filename,outstr);
+		printf "Verified lift %o\n", str;
+	else 
+		printf "Failed to verify lift %o\n", str;
+	end if;
+end procedure;
+
+
 // checks part 2 of the conjecture for the forms in d*_liftable.csv
 procedure CheckConjecture2(d : verbose := false)
 	assert d in {1,2,3,7,11};
