@@ -675,7 +675,8 @@ end function;
 
 // tries to verify a probable lift from LMFDB data via cocycles. `zealous` option 
 // checks all of them, rather than quitting once one has been found.
-function VerifyLMFDBLift(d,str : zealous := false)
+// `careful` option refuses to compute spaces with level more than norm 5000
+function VerifyLMFDBLift(d,str : zealous := false, careful := false)
 	K := QuadFld(d);
 	ZK := MaximalOrder(K);
 
@@ -702,29 +703,33 @@ function VerifyLMFDBLift(d,str : zealous := false)
 
 	for label in liftLabels do 
 		level2 := LMFDBIdeal(K, label);
-
-		B2 := BianchiCohomologySpace(level2, W1);
-		B3 := BianchiCohomologySpace(level2, W2);
-
-		// this is the level-raise factor 
-		D := level2/level1;
-		if GCD(level1,D) eq 1*ZK then 
-			level_raise_f := [RaiseCocycleLevel(B1,B2,f,dd) : dd in Divisors(D)];
+		if careful and Norm(level2) gt 5000 then
+			print "Level norm exceeds sensible bounds, please deactivate careful mode";
 		else 
-			level_raise_f := [RaiseCocycleLevelSlow(B1,B2,f,dd) : dd in Divisors(D)];
-		end if;
-		level_raise_space := sub<B2`forms | [B2`down(ff`Zvector) : ff in level_raise_f]>;
 
-		red := ReductionModPMap(B3, B2);
-		red_forms := CharacteristicZeroImage(B2,B3);
+			B2 := BianchiCohomologySpace(level2, W1);
+			B3 := BianchiCohomologySpace(level2, W2);
 
-		lb := Dimension(level_raise_space meet red_forms) ge 1;
+			// this is the level-raise factor 
+			D := level2/level1;
+			if GCD(level1,D) eq 1*ZK then 
+				level_raise_f := [RaiseCocycleLevel(B1,B2,f,dd) : dd in Divisors(D)];
+			else 
+				level_raise_f := [RaiseCocycleLevelSlow(B1,B2,f,dd) : dd in Divisors(D)];
+			end if;
+			level_raise_space := sub<B2`forms | [B2`down(ff`Zvector) : ff in level_raise_f]>;
 
-		if zealous then 
-			Append(~lift_bools,lb);
-		else 
-			if lb then 
-				return true,label;
+			red := ReductionModPMap(B3, B2);
+			red_forms := CharacteristicZeroImage(B2,B3);
+
+			lb := Dimension(level_raise_space meet red_forms) ge 1;
+
+			if zealous then 
+				Append(~lift_bools,lb);
+			else 
+				if lb then 
+					return true,label;
+				end if;
 			end if;
 		end if;
 

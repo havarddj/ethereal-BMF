@@ -3,7 +3,7 @@ AttachSpec("../spec");
 
 load "look_for_lifts.m";
 
-d := 3;
+d := 7;
 
 K := QuadFld(d);
 ZK := MaximalOrder(K);
@@ -11,7 +11,7 @@ ZK := MaximalOrder(K);
 rr := Read("sage/d" cat Sprint(d) cat "_liftable.csv");
 num := #Split(rr);
 
-inds := [2..10];
+inds := [92];
 
 for i in inds do 
 	VerifyLift(d,i);
