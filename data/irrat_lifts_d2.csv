@@ -126,3 +126,49 @@ level; prime; lift level;2.1;3.1;3.2;11.1;11.2;17.1;17.2;19.1;19.2;25.1;41.1;41.
 523.2;2;None found
 523.2;31;No level raising primes available
 524.1;31;None found
+753.3;251;None found
+753.4;13;None found
+753.4;151;None found
+753.4;23;None found
+758.1;11;None found
+761.1;163;No level raising primes available
+761.1;3;None found
+761.1;743;No level raising primes available
+769.2;11;None found
+769.2;127849;No level raising primes available
+771.3;5821;None found
+771.4;47;None found
+774.5;13;None found
+776.1;137;None found
+779.1;19;No level raising primes available
+779.1;29;No level raising primes available
+779.1;37;None found
+779.3;29;No level raising primes available
+786.2;3;None found
+786.2;3;7074.6;[ 0, 1, 0 ];[ 12, -8/7, -3/7 ];[ 14, -6/7, -4/7 ];[ -12, 6/7, 4/7 ];[ 4, 2/7, -1/7 ];[ 2, 1, 0 ];[ -10, 3/7, 2/7 ];[ 4, 0, 0 ];[ -26, 2, 1 ];[ 2, 4/7, -2/7 ];[ 8, -6/7, -4/7 ];[ -6, 12/7, 1/7 ];[ -8, 8/7, 3/7 ];[ 10, 11/7, -2/7 ];[ 14, -10/7, -2/7 ];[ 20, -18/7, -5/7 ];[ 12, -10/7, -2/7 ];[ 6, -8/7, -3/7 ];[ -20, 13/7, 4/7 ];[ 30, -12/7, -8/7 ];[ -6, 6/7, 4/7 ];[ -28, 23/7, 6/7 ];[ 2, -10/7, -2/7 ];[ 4, -1, 0 ];x^3 - 2*x^2 - 35*x + 98
+787.1;19;None found
+787.1;19;No level raising primes available
+787.1;293;No level raising primes available
+787.1;337;No level raising primes available
+801.1;17;None found
+801.1;23;None found
+801.1;3;2403.1;[ 0, 1, 0 ];[ -3, 0, 1 ];[ 0, -1, 0 ];[ 0, -1, 1 ];[ 6, 2, -1 ];[ 8, 0, -3 ];[ -10, 1, 3 ];[ -1, 2, 1 ];[ 0, -2, 1 ];[ 3, 0, -3 ];[ 2, 2, 1 ];[ 8, -2, -1 ];[ -13, 1, 3 ];[ -12, -4, 4 ];[ 15, 2, -4 ];[ 2, 0, 2 ];[ 14, 2, -3 ];[ 2, -4, 0 ];[ 8, -1, 0 ];[ -9, 5, 3 ];[ -6, 5, 0 ];[ -6, 3, 0 ];[ 11, -5, -3 ];[ 14, 1, -2 ];x^3 - x^2 - 4*x + 3
+801.2;23;None found
+801.2;71;None found
+531.4;3;None found
+531.6;31;None found
+531.6;3;None found
+534.4;3;None found
+536.1;139;None found
+537.1;769;None found
+537.3;107;None found
+537.3;13;None found
+537.3;7;None found
+539.2;79;None found
+547.2;1376237;No level raising primes available
+550.1;73;None found
+556.2;907;None found
+561.3;5;None found
+561.7;11;None found
+561.7;23;None found
+561.8;29;None found
