@@ -60,7 +60,6 @@ class HeckeEig():
     
     def eigenvalues(self):
         return self.evals
-        # return list(self.evals.values())
 
     def add_rational_lift(self, lift):
         self.rational_lifts.append(lift)
@@ -141,10 +140,6 @@ class HeckeEig():
 #     print("Finished computing non-Eisenstein systems, written to ../data/nonEis_d2.csv")
 #     return 0
 
-
-# I think we need to assume that the list of eigenvalues is aligned with the list in lmfdb,
-# i.e. that the i-th entry corresponds to the same ideal in both lists. Not happy.
-
 def find_congruent_forms(d, input_file = None, find_all_lifts = False):
     """
     Search LMFDB for Bianchi eigenforms on field on discriminant d
@@ -190,7 +185,6 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
             if is_valid:
                 modp_evs.append(HeckeEig(ev, lvl, p))
 
-    # return modp_evs;
 
     max_ev_len = max(len(h.eigenvalues()) for h in modp_evs)
     prime_list = [prime_from_label(K,lab) for lab in prime_labels]
@@ -320,7 +314,24 @@ def ul_filter_csv(d):
             if row == []:
                 continue
             p = eval(row[1])
-            if any([row[0] == h.level_label() and p == h.p() for h in modp_evs]) or any(["[" in r for r in row]):
+            # irrational eigenvalue systems are never searched for in the LMFDB,
+            # so they always get passed on to the magma stage
+            if any("[" in r for r in row):
+                lines.append(";".join(row))
+                continue
+            evs = []
+            is_valid = True
+            for x in row[2:-1]:
+                try:
+                    evs.append(ZZ(0) if x == "-" else ZZ(x))
+                except TypeError:
+                    print(f"Failed to coerce {x} to integer in row {row[0]};{row[1]}")
+                    is_valid = False
+                    break
+            if not is_valid:
+                continue
+            if any(row[0] == h.level_label() and p == h.p() and list(h.eigenvalues()) == evs
+                   for h in modp_evs):
                 lines.append(";".join(row))
         
     with open(output_file, "w") as f:

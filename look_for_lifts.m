@@ -454,11 +454,14 @@ function LookForLMFDBUnliftable(d : liftLvlLowerBd :=0, liftLvlUpperBd := 10000,
 	fprintf output, "level; prime; lift level;" cat Join(topElts[3..#topElts], ";") cat "\n";
     end if;
     
-    // Helper function 
+    // Helper function: has a lift for this line already been recorded?
     HasFoundLift := function(line, output)
 	existingLines := Split(Read(output), "\n");
 	lvl := Split(line, ";")[1];
 	p := Split(line, ";")[2];
+	if #[l : l in lines[2..#lines] | Split(l, ";")[1] eq lvl and Split(l, ";")[2] eq p] gt 1 then
+	    return false;
+	end if;
 	for exLine in existingLines do
 	    if Split(exLine, ";")[1] eq lvl and Split(exLine, ";")[2] eq p then
 		return "level raising" notin exLine and "None found" notin exLine;
@@ -466,6 +469,7 @@ function LookForLMFDBUnliftable(d : liftLvlLowerBd :=0, liftLvlUpperBd := 10000,
 	end for;
 	return false;
     end function;
+    
     for line in lines[2..#lines] do
 	lvl := Split(line, ";")[1];
 	Nm := Norm(LMFDBIdeal(F,lvl));
@@ -490,8 +494,9 @@ function LookForLMFDBUnliftable(d : liftLvlLowerBd :=0, liftLvlUpperBd := 10000,
 	prime := Split(line, ";")[2];
 	resultLine := lvl cat ";" cat prime cat ";" cat resultLine cat "\n";
 	if resultLine notin Read(output) then
-	    print "Result already stored, moving on";
 	    fprintf output, resultLine;
+	else
+	    print "Result already stored, moving on";
 	end if;
 	print "\n\n";
     end for;
@@ -512,7 +517,9 @@ function LookForAllIrrational(d)
 	end if;
 	
 	id := Split(line, ";")[1] cat ";" cat Split(line, ";")[2] cat ";";
-	if id in Read(output) then
+	// As in LookForLMFDBUnliftable: id only identifies the line when no other
+	// line shares its level and prime, so otherwise we redo the search.
+	if id in Read(output) and #[l : l in lines[2..#lines] | "[" in l and id eq Split(l, ";")[1] cat ";" cat Split(l, ";")[2] cat ";"] eq 1 then
 	    continue;
 	end if;
 	print "Looking for lifts of id", id;
@@ -525,7 +532,10 @@ function LookForAllIrrational(d)
 	
 
 	// if Sprint(res) eq "None found" then
-	fprintf output, id cat Sprint(res) cat "\n";
+	resultLine := id cat Sprint(res) cat "\n";
+	if resultLine notin Read(output) then
+	    fprintf output, resultLine;
+	end if;
 	    // else
 	    // fprintf output, id cat Sprint(res);
 	// end if;
