@@ -309,7 +309,7 @@ def load_liftable_from_csv(d):
             
     return modp_evs
 
-def load_irrat_results(d):
+def load_irrat_lifts(d):
     """Load list of all irrational forms with lifts from ../data/irrat_lifts_d{d}.csv,
     ignoring the ones where we haven't found anything yet."""
     K = QuadFld(d)
