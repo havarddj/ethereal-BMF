@@ -30,13 +30,14 @@ def QuadFld(d):
     return F
 
 class HeckeEig():
-    def __init__(self, evals, lvl, p, label=None):
+    def __init__(self, evals, lvl, p, label=None, is_irrational=False):
         self.evals = evals
         self.lvl = lvl
         self.prime = p
         self.rational_lifts = []
         self.irrational_lifts = []
         self._label = label
+        self.is_irrational = is_irrational
 
     def __repr__(self):
         if self._label:
@@ -308,7 +309,7 @@ def load_liftable_from_csv(d):
             
     return modp_evs
 
-def load_irrat_lifts(d):
+def load_irrat_results(d):
     """Load list of all irrational forms with lifts from ../data/irrat_lifts_d{d}.csv,
     ignoring the ones where we haven't found anything yet."""
     K = QuadFld(d)
@@ -330,16 +331,51 @@ def load_all_from_csv(d):
     """
     Load liftable and unliftable forms, including those where we haven't found lifts yet.
     """
-    liftable_evs = load_liftable_from_csv(d)
-    unliftable_evs = load_unliftable_from_csv(d)
+    # first, collect forms from three different sources
+    rat_l_forms = load_liftable_from_csv(d)
+    rat_ul_forms = load_unliftable_from_csv(d)
+    irrat_forms = load_irrat_forms(d)
+
+    # then eliminate the ones where we found a lift using magma
     irrat_lifts = load_irrat_lifts(d)
-    for h in unliftable_evs:
+
+    for h in rat_ul_forms:
         cand = [g for g in irrat_lifts if h.level() == g.level() and h.p() == g.p()]
         if cand:
             h.add_irrational_lift(cand[0].get_irrational_lifts()[0])
-    return liftable_evs + unliftable_evs
+
+    for h in irrat_forms:
+        cand = [g for g in irrat_lifts if h.level() == g.level() and h.p() == g.p()]
+        if cand:
+            h.add_irrational_lift(cand[0].get_irrational_lifts()[0])
+
+    return rat_l_forms + rat_ul_forms + irrat_forms
 
 
+def load_irrat_forms(d):
+    """
+    Load irrational mod p Hecke eigenvalue systems 
+    """
+    K = QuadFld(d)
+    input_file = f"../data/nonEis_d{d}.csv"
+
+    irrat_forms = []
+    with open(input_file, newline='') as f:
+        csv_reader = csv.reader(f, delimiter=';')
+        # TODO: find a good way to parse Hecke evals
+        for i, row in enumerate(csv_reader):
+            if i == 0:
+                continue
+            p = eval(row[1])
+            
+            lvl = ideal_from_label(K, row[0])
+            if any("[" in r for r in row):
+                irrat_forms.append(HeckeEig(
+                    None, lvl, p, is_irrational=True
+                ))
+
+    return irrat_forms
+    
 def ul_filter_csv(d):
     """
     Create magma-readable file with EBMFs which don't lift in the lmfdb
@@ -347,8 +383,6 @@ def ul_filter_csv(d):
     F = QuadFld(d)
     input_file = f"../data/nonEis_d{d}.csv"
     output_file = f"../data/lmfdbNonlift_d{d}.csv"
-    with open(input_file, newline='') as f:
-        csv_reader = csv.reader(f, delimiter=';')
         
     modp_evs = load_unliftable_from_csv(d)
     modp_evs = [h for h in modp_evs]
@@ -357,8 +391,8 @@ def ul_filter_csv(d):
         csv_reader = csv.reader(f, delimiter=';')
         # add top line
         lines.append(";".join(next(csv_reader)))
-        for row in csv_reader:
-            if row == []:
+        for i,row in enumerate(csv_reader):
+            if i == []:
                 continue
             p = eval(row[1])
             # irrational eigenvalue systems are never searched for in the LMFDB,
@@ -393,27 +427,6 @@ def ul_print_LR_primes(d):
     
     for h in modp_evs:
         print(h.level_label(),h.p(),h.LR_primes())
-
-def look_for_mult_liftable(d):
-    """
-    Use magma to look for higher multiplicity in lifted space
-    """
-    F = QuadFld(d)
-    modp_evs = load_liftable_from_csv(d)
-    magma.attach_spec("../../spec")
-    magma.load("../check_mult_2.m")
-
-    for h in modp_evs:
-        # TODO: change this to look for all
-        lift_lvl = level_from_BMF_label(F, h.get_rational_lifts()[0])
-        lift_lvl_label = ideal_label(lift_lvl)
-        if lift_lvl.norm() > 1000:
-            print(f"Lift level {lift_lvl_label} too big, skipping")
-            continue
-        # lift = h['']
-        print(f"Looking for multiplicity >1 in lvl {lift_lvl_label} lifting {h.level_label()}")
-        print(magma.eval(f"CheckHighMult({d}, \"{h.level_label()}\", {h.p()}, \"{lift_lvl_label}\");"))
-    
         
 def print_lifts(d):
     modp_evs = load_liftable_from_csv(d)
@@ -426,7 +439,6 @@ def print_lifts(d):
         
 def level_from_BMF_label(F, label):
     return ideal_from_label(F, label.split('-')[1])
-    
 
 def load_p_liftable(d):
     evs = load_liftable_from_csv(d)
@@ -447,14 +459,17 @@ def load_p_liftable(d):
     print(f"{len(p_evs)}/{len(evs)} have p-lifts")
     return p_evs
         
-def count_l_vs_ul(d, norm_bd=500, p_bd=20):
+def count_l_vs_ul(d, norm_bd=500, p_bd=20, print_unliftable=False):
     all_evs = load_all_from_csv(d)
     ls = [h for h in all_evs if h.has_lift()]
     uls = [h for h in all_evs if not h.has_lift()]
     ls = [ev for ev in ls if ev.level().norm() <= norm_bd and ev.p() < p_bd]
     uls = [ev for ev in uls if ev.level().norm() <= norm_bd and ev.p() < p_bd]
     print(f"{len(ls)}/{len(ls) + len(uls)} of forms with p < {p_bd} and lvl norm < {norm_bd} have char 0 lifts")
-
+    if print_unliftable and len(uls) > 0:
+        print("Forms without known lift:" + " "*(len(f"{uls[0]}") - 18) + "Irrational?")
+        for ev in uls:
+            print(f"{ev}\t {ev.is_irrational}")
     return len(ls)/(len(ls) + len(uls))
 
     
