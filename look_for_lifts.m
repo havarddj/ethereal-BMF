@@ -761,7 +761,7 @@ procedure VerifyLift(d,linenum)
 	if tt then 
 		outstr := levelLabel cat ";" cat p cat ";" cat liftLabel cat ";" cat eigs;
 		Write(filename,outstr);
-		printf "%o: Verified lift %o\n", linenum, str;
+		printf "%o: Verified lift %o\n", linenum, levelLabel cat ";" cat p cat ";" cat eigs;
 	else 
 		printf "Failed to verify lift %o\n", str;
 	end if;
