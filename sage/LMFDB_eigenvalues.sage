@@ -30,17 +30,19 @@ def QuadFld(d):
     return F
 
 class HeckeEig():
-    # list of rational lifts of Hecke eigenvalue system
-    # can't make it set bc/ lists are not hashable
-    def __init__(self, evals, lvl, p):
+    def __init__(self, evals, lvl, p, label=None):
         self.evals = evals
         self.lvl = lvl
         self.prime = p
         self.rational_lifts = []
         self.irrational_lifts = []
+        self._label = label
 
     def __repr__(self):
-        return f"Mod {self.p()} Bianchi eigenvalue system of level {self.level_label()}"
+        if self._label:
+            return self.label()
+        else:
+            return f"Characteristic {self.p()} Bianchi eigenvalue system of level {self.level_label()}"
 
     # Helper methods to make code below cleaner.
     # Not strictly necessary, but prevents us from accidentally
@@ -50,7 +52,8 @@ class HeckeEig():
 
     def level_label(self):
         return ideal_label(self.level())
-
+    def label(self):
+        return self.label
     
     def field(self):
         return self.level().number_field()
@@ -64,11 +67,23 @@ class HeckeEig():
     def add_rational_lift(self, lift):
         self.rational_lifts.append(lift)
 
+    def add_irrational_lift(self, lift):
+        self.irrational_lifts.append(lift)
+
     def has_rational_lift(self):
         return self.rational_lifts != []
 
+    def has_irrational_lift(self):
+        return self.irrational_lifts != []
+
+    def has_lift(self):
+        return self.has_rational_lift() or self.has_irrational_lift()
+
     def get_rational_lifts(self):
         return self.rational_lifts
+
+    def get_irrational_lifts(self):
+        return self.irrational_lifts
 
     def csv_dict(self):
         if self.has_rational_lift():
@@ -223,7 +238,7 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
             if all(((ev[i] - hit_ev[i]) % p == 0 or prime_list[i].divides(p*hit_lvl))
                    for i in range(min_len)):
                 print("Found rational lift for", hecke_ev, "of level", ideal_label(hit_lvl))
-                hecke_ev.add_rational_lift({'label': hit['label'], 'evals': hit_ev, 'level': hit_lvl})
+                hecke_ev.add_rational_lift(hit['label'])
             
     return modp_evs
 
@@ -292,6 +307,38 @@ def load_liftable_from_csv(d):
             modp_evs.append(h)
             
     return modp_evs
+
+def load_irrat_lifts(d):
+    """Load list of all irrational forms with lifts from ../data/irrat_lifts_d{d}.csv,
+    ignoring the ones where we haven't found anything yet."""
+    K = QuadFld(d)
+    irrat_lifts = []
+    with open(f'../data/irrat_lifts_d{d}.csv') as f:
+        reader = csv.DictReader(f, delimiter=';')
+        for r in reader:
+            if not "No" in r[' lift level']:
+                p = ZZ(r[' prime'])
+                lvl = ideal_from_label(K, r['level'])
+                h = HeckeEig(None, lvl, p)
+                h.add_irrational_lift(r[' lift level'])
+                irrat_lifts.append(h)
+
+    return irrat_lifts
+        
+
+def load_all_from_csv(d):
+    """
+    Load liftable and unliftable forms, including those where we haven't found lifts yet.
+    """
+    liftable_evs = load_liftable_from_csv(d)
+    unliftable_evs = load_unliftable_from_csv(d)
+    irrat_lifts = load_irrat_lifts(d)
+    for h in unliftable_evs:
+        cand = [g for g in irrat_lifts if h.level() == g.level() and h.p() == g.p()]
+        if cand:
+            h.add_irrational_lift(cand[0].get_irrational_lifts()[0])
+    return liftable_evs + unliftable_evs
+
 
 def ul_filter_csv(d):
     """
@@ -399,15 +446,14 @@ def load_p_liftable(d):
                 break
     print(f"{len(p_evs)}/{len(evs)} have p-lifts")
     return p_evs
-
-            
         
 def count_l_vs_ul(d, norm_bd=500, p_bd=20):
-    ls = load_liftable_from_csv(d)
-    uls = load_unliftable_from_csv(d)
+    all_evs = load_all_from_csv(d)
+    ls = [h for h in all_evs if h.has_lift()]
+    uls = [h for h in all_evs if not h.has_lift()]
     ls = [ev for ev in ls if ev.level().norm() <= norm_bd and ev.p() < p_bd]
     uls = [ev for ev in uls if ev.level().norm() <= norm_bd and ev.p() < p_bd]
-    print(f"{len(ls)}/{len(ls) + len(uls)} have rational lifts")
+    print(f"{len(ls)}/{len(ls) + len(uls)} of forms with p < {p_bd} and lvl norm < {norm_bd} have char 0 lifts")
 
     return len(ls)/(len(ls) + len(uls))
 
