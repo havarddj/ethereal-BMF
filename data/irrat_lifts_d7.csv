@@ -80,3 +80,129 @@ level; prime; lift level;2.1;2.2;7.1;9.1;11.1;11.2;23.1;23.2;25.1;29.1;29.2;37.1
 526.2;41;None found
 526.2;113;None found
 536.2;29;None found
+751.2;7;None found
+751.2;5417;No level raising primes available
+751.2;36137;No level raising primes available
+757.1;71;5299.1;[ 0, 1, 0, 0 ];[ -1, 0, 0, 0 ];[ -2, 9, 0, -2 ];[ 3, -6, 0, 1 ];[ 1, 4, -1, -1 ];[ 0, 5, 0, -1 ];[ 0, -13, 0, 3 ];[ 0, -9, 0, 2 ];[ -8, 0, 2, 0 ];[ 0, 10, -1, -2 ];[ 3, -1, -1, 0 ];[ -2, -6, 2, 2 ];[ -5, -14, 3, 3 ];[ -3, 22, -1, -5 ];[ 0, 2, 0, 0 ];[ -2, -16, 2, 4 ];[ 7, -6, -4, 1 ];[ -4, -4, 0, 0 ];[ 12, 0, -4, 0 ];[ -7, -1, 3, 1 ];x^4 - 5*x^2 + x + 1
+757.1;177379;No level raising primes available
+758.1;31;None found
+758.3;3;None found
+763.2;3;None found
+763.2;7;None found
+763.2;17;None found
+763.2;31;None found
+764.6;23;None found
+772.2;29;None found
+772.6;71;None found
+774.1;23;None found
+778.2;11;None found
+778.4;89;None found
+781.2;11;None found
+781.2;31;None found
+781.2;83;None found
+788.6;211;None found
+788.5;7;None found
+792.7;3;8712.10;[ -1, -1 ];[ 1, -1 ];[ 2, -1 ];[ 0, -3 ];[ -4, 1 ];[ 1, -1 ];[ 2, 2 ];[ -4, 1 ];[ -5, -2 ];[ -5, -1 ];[ -5, -4 ];[ 5, 3 ];[ 2, 1 ];[ 4, -4 ];[ -11, -3 ];[ 8, 0 ];[ 10, 2 ];[ 6, -4 ];[ -5, -7 ];[ -9, 1 ];x^2 + x - 4
+802.4;139;None found
+802.3;37;None found
+809.1;541;No level raising primes available
+809.1;6521;No level raising primes available
+812.6;5;None found
+812.6;43;None found
+814.1;23;None found
+814.1;101;None found
+814.3;43;None found
+821.1;5;None found
+821.1;2119631;No level raising primes available
+823.1;23;1646.3;[ 0, -1 ];[ 0, 3 ];[ -3, -1 ];[ 0, 0 ];[ -4, -1 ];[ -2, -4 ];[ -6, -1 ];[ 0, 2 ];[ -1, 0 ];[ -5, 1 ];[ -1, 0 ];[ 5, -1 ];[ -4, 1 ];[ -2, 2 ];[ 0, -9 ];[ -6, -3 ];[ 2, -8 ];[ -6, 4 ];[ 5, 1 ];[ 12, 3 ];x^2 - 2
+823.1;4013;No level raising primes available
+827.2;29;1654.2;[ 1, -1 ];[ -3, 2 ];[ 2, -2 ];[ -1, -2 ];[ 2, 0 ];[ 0, 4 ];[ -4, 6 ];[ -8, 0 ];[ 10, -2 ];[ -3, 0 ];[ 3, 2 ];[ -3, -6 ];[ 0, -6 ];[ 7, 0 ];[ 1, -2 ];[ -3, 10 ];[ -4, 12 ];[ 3, -6 ];[ 0, 0 ];[ -6, 6 ];x^2 - x - 1
+827.2;176089;No level raising primes available
+828.1;29;None found
+842.3;23;None found
+842.3;457;None found
+844.4;11;None found
+844.5;1657;None found
+847.2;17;None found
+847.1;13;1694.1;[ -2, -1 ];[ 1, 0 ];[ -3, -1 ];[ -3, 1 ];[ 6, 1 ];[ 0, 1 ];[ -6, -1 ];[ 0, -2 ];[ -4, -1 ];[ 4, 5 ];[ -6, 2 ];[ 4, 5 ];[ -11, -2 ];[ 2, -4 ];[ 2, 0 ];[ -3, -7 ];[ -3, 4 ];[ 6, 3 ];[ -4, -1 ];[ -1, -2 ];x^2 + 2*x - 2
+851.4;3;None found
+851.4;7;None found
+851.4;23;None found
+851.4;29;No level raising primes available
+851.4;37;1702.8;[ 0, -1 ];[ -1, 2 ];[ -2, 1 ];[ -2, 0 ];[ -4, -1 ];[ -4, -2 ];[ -2, -4 ];[ 0, 0 ];[ -4, 2 ];[ 5, 0 ];[ 1, -6 ];[ 4, 4 ];[ -2, -4 ];[ 2, 2 ];[ -2, 3 ];[ 0, 4 ];[ -14, 1 ];[ 0, -6 ];[ 0, 0 ];x^2 - 3
+851.2;19;None found
+851.2;197;No level raising primes available
+851.2;223;No level raising primes available
+862.2;13;None found
+862.2;43;None found
+862.4;199;None found
+863.2;17471;No level raising primes available
+863.2;77491;No level raising primes available
+869.1;7;None found
+869.1;29;None found
+869.1;701;None found
+872.8;3;None found
+872.8;11;None found
+877.1;397;No level raising primes available
+877.1;10657;No level raising primes available
+883.2;211;No level raising primes available
+883.2;16453799;No level raising primes available
+886.4;7;None found
+886.4;283;None found
+886.2;3;None found
+886.2;14797;None found
+898.2;3;None found
+898.2;5;None found
+536.4;7;None found
+536.8;11;None found
+541.2;61;None found
+541.2;83;No level raising primes available
+541.2;97;No level raising primes available
+547.2;1481759;No level raising primes available
+550.3;7;None found
+550.3;29;None found
+553.1;11;None found
+553.1;661;None found
+554.2;3;None found
+554.2;61;None found
+554.4;43;None found
+557.1;11;None found
+557.1;47297;No level raising primes available
+562.3;23;None found
+568.1;23;None found
+568.1;73;None found
+569.1;149;No level raising primes available
+571.2;29;No level raising primes available
+571.2;1439;No level raising primes available
+575.2;13;No level raising primes available
+575.2;31;None found
+583.4;17;None found
+583.4;47;None found
+904.5;11;None found
+904.7;37;None found
+904.8;3;None found
+904.8;23;None found
+907.2;47;No level raising primes available
+911.2;53;No level raising primes available
+911.2;83;None found
+911.2;229;No level raising primes available
+914.3;5;None found
+914.4;13;None found
+914.4;103;None found
+919.1;43;No level raising primes available
+919.1;1289;No level raising primes available
+919.1;55343;No level raising primes available
+925.1;23;No level raising primes available
+925.1;29;No level raising primes available
+925.1;41;No level raising primes available
+925.1;307;No level raising primes available
+925.1;853;No level raising primes available
+926.1;101;None found
+926.2;7;None found
+926.2;13;None found
+926.2;13;1852.4;[ -4 ];[ -5 ];[ -2 ];[ -4 ];[ -7 ];[ 3 ];[ -2 ];[ -6 ];[ 6 ];[ 0 ];[ 3 ];[ 1 ];[ -8 ];[ 10 ];[ 13 ];[ -14 ];[ -12 ];[ 0 ];[ -12 ];[ 7 ];[ -4 ];x - 1
+926.2;79;None found
+928.3;3;1856.5;[ 4, -1 ];[ -2, 0 ];[ 4, -2 ];[ -2, 2 ];[ 6, -2 ];[ -2, 2 ];[ 4, 1 ];[ -2, 2 ];[ 6, -2 ];[ 0, 1 ];[ 0, 0 ];[ 10, 0 ];[ -2, 0 ];[ 0, 3 ];[ 6, 0 ];[ -8, 2 ];[ 8, -2 ];[ 0, 0 ];[ 4, 1 ];x^2 - 4*x - 4
+932.5;17;None found
+946.4;13;None found
+946.4;13;8514.4;[ 0, 1, 0 ];[ -2, 0, 0 ];[ 3, 0, -1 ];[ -7, 0, 1 ];[ 4, -2, -2 ];[ 1, -1, 0 ];[ -10, -2, 2 ];[ 4, -1, -1 ];[ -7, 0, 1 ];[ -1, -1, 0 ];[ -9, 5, 2 ];[ -4, -3, 1 ];[ 9, -2, -3 ];[ -7, 7, 2 ];[ -6, 0, 2 ];[ 12, 1, -1 ];[ -7, 2, 1 ];[ -13, -3, 2 ];[ 6, -4, -2 ];x^3 + x^2 - 5*x - 1
