@@ -188,3 +188,23 @@ level; prime; lift level;2.1;3.1;3.2;11.1;11.2;17.1;17.2;19.1;19.2;25.1;41.1;41.
 582.3;23;None found
 587.2;149;No level raising primes available
 593.1;17;None found
+600.1;11;6600.2;[ -1, 0 ];[ 5, 3 ];[ -3, -1 ];[ 6, 3 ];[ -4, -2 ];[ -8, -4 ];[ -1, -1 ];[ 1, 0 ];[ -3, -1 ];[ -3, 1 ];[ 2, 1 ];[ -2, -2 ];[ 3, -1 ];[ -5, 1 ];[ -7, -3 ];[ 8, 1 ];[ -16, 0 ];[ 5, 2 ];[ 15, 5 ];[ -3, 2 ];[ -12, 1 ];[ 0, 3 ];x^2 + 4*x - 1
+601.1;11964811;No level raising primes available
+603.5;11;None found
+614.1;11;None found
+614.1;7;1842.1;[ -1, -1 ];[ 1, 1 ];[ 1, -1 ];[ 2, -1 ];[ 0, 2 ];[ 0, 0 ];[ 0, -1 ];[ 4, 2 ];[ 8, 0 ];[ 2, 1 ];[ 4, 0 ];[ 6, 0 ];[ 0, -4 ];[ 4, 1 ];[ -6, 2 ];[ 4, -2 ];[ 0, 4 ];[ -5, -1 ];[ 16, 0 ];[ 4, 0 ];[ -8, -4 ];[ -11, -3 ];[ -8, -3 ];[ 6, 0 ];x^2 + x - 7
+617.2;103;No level raising primes available
+617.2;11;None found
+617.2;59;No level raising primes available
+617.2;7;No level raising primes available
+619.2;4951;No level raising primes available
+626.1;7;None found
+627.1;53;None found
+627.4;13;None found
+627.6;23;None found
+627.7;19;None found
+633.3;3691;None found
+633.3;73;None found
+633.4;1759;None found
+641.1;23;None found
+641.1;76081;No level raising primes available
