@@ -35,7 +35,7 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 		//print BG;
 		print B2;
 		for f in EigenformGaloisRepresentatives(B2) do
-		    if not IsEisenstein(f) and HasEtherealEigenvalues(B1,f) and f`eigenspaceDim eq 1 then
+		    if not IsEisenstein(f) and HasEtherealEigenvalues(B1,f) then
 			WriteClass(f, filename : labels := labels);
 			print "Wrote class to file!\n";
 		    end if;
