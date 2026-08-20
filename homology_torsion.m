@@ -95,15 +95,24 @@ function ComputeLevelsAndPrimes(d : lowerBound := 1, upperBound:= 1000)
     sigma := Automorphisms(F)[2];
 
     Ids := IdealsUpTo(upperBound,F);
-    Ids_no_conj := [];
+    idsNoConj := [];
     for u in Ids do 
-	if not sigma(u) in Ids_no_conj and Norm(u) ge lowerBound then 
-	    Append(~Ids_no_conj,u);
+	if Norm(u) ge lowerBound then
+	    // Sort to get consistent ordering
+	    // TODO: 133.10 < 133.2, fix if we care!
+	    us := [u, sigma(u)];
+	    labs := [LMFDBLabel(u), LMFDBLabel(sigma(u))];
+	    ParallelSort(~labs, ~us);
+	    if not us[1] in idsNoConj then
+		Append(~idsNoConj, us[1]);
+	    end if;
+	    
 	end if;
     end for;
+
     data:=[];
 
-    for u in Ids_no_conj do 
+    for u in idsNoConj do 
 	_,g:=IsPrincipal(u);
 	invs:=ExtraModPClasses(u);
 	if invs[#invs] ne 0 then 

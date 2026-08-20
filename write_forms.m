@@ -10,14 +10,14 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
     
     F:=QuadFld(d);
     ZF:=MaximalOrder(F);
-    filename := "data/nonEis_d" cat Sprint(d) cat "_" cat Sprint(levelLowerBd) cat "_" cat Sprint(levelUpperBd) cat ".csv";
-    // bd := 100;
+    filename := "data/nonEis_d" cat Sprint(d) cat "_v2.csv";
     labels := [LMFDBLabel(pp) : pp in SortByLMFDBLabel(PrimesUpTo(heckeBd, F)) ];
 
     // need to mess around a bit to make sure we don't print the final semicolon
-    fprintf filename, "level;p;%o;Coeff_minpoly\n", Join(labels, ";");
+    fprintf filename, "level;p;%o;dim;generalized-dim;Coeff_minpoly\n", Join(labels, ";");
 
     for L in levels_and_primes do
+	// level := L[1];
 	level_gen := L[1];
 	level := (ZF!level_gen)*ZF;
 	// if levelLowerBd is non-zero
@@ -31,11 +31,17 @@ function ComputeNonliftable(d : heckeBd := 100, levelUpperBd := 1000, levelLower
 		wt2 := BianchiWeight(F, 0,0 : char:= Integers()!p);
 		B2 := BianchiCohomologySpace(level,wt2);
 		SetHeckeBound(B2, heckeBd);
-		//BG := EtherealSubspace(B1,B2);
-		//print BG;
 		print B2;
+		oldSpaces := false;
+		
 		for f in EigenformGaloisRepresentatives(B2) do
-		    if not IsEisenstein(f) and HasEtherealEigenvalues(B1,f) then
+		    if IsEisenstein(f) then
+			continue;
+		    end if;
+		    if oldSpaces cmpeq false then
+			oldSpaces := OldLevelSpaces(B2);
+		    end if;
+		    if IsNew(f : OldSpaces := oldSpaces) and HasEtherealEigenvalues(B1, f) then
 			WriteClass(f, filename : labels := labels);
 			print "Wrote class to file!\n";
 		    end if;
