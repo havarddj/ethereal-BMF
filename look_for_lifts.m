@@ -35,10 +35,48 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, storeForms := true)
-    LR_nums := LevelRaiseFactors(f, Min(Floor(lvlUpperBd/Norm(Level(f))), 4000));
-    // LR_nums := LevelRaisingPrimes(f);
-    // LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
+function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, from_data := false, storeForms := true)
+	// the `from_data` parameter lets us use level-raise primes we might have computed up to a larger bound.
+	if from_data then
+		K := Parent(f)`field;
+		ZK := MaximalOrder(K);
+		dd := Discriminant(K);
+		if dd mod 4 eq 0 then
+			dd := dd div 4;
+		end if;
+		p := Characteristic(Parent(f));
+		level := Level(f);
+		// TODO: change this when we store data in one csv file rather than many files  
+		f_file := "data/LR/" cat Sprint(-dd) cat "/" cat LMFDBLabel(level) cat "_" cat Sprint(p);
+		labels := Split(Read(f_file));
+		LR_primes := [LMFDBIdeal(K,str) : str in labels] cat [f[1] : f in Factorization(level*p)];
+		LR_nums := [1*ZK];
+		
+		to_add := LR_primes;
+
+		// we keep adding (up to the bound) until there's nothing left to add
+		while #to_add ne 0 do 
+			new_to_add := [];
+			for I in LR_nums do 
+				for J in to_add do 
+					if Norm(I*J*level) le lvlUpperBd and not I*J in LR_nums then 
+						Append(~LR_nums,I*J);
+						Append(~new_to_add,J);
+					end if;
+				end for;
+			end for;
+			to_add := new_to_add;
+		end while;
+		Remove(~LR_nums,1);
+
+		nn := [Norm(u) : u in LR_nums];
+		ParallelSort(~nn,~LR_nums);
+
+	else 
+	    LR_nums := LevelRaiseFactors(f, Min(Floor(lvlUpperBd/Norm(Level(f))), 4000));
+	    // LR_nums := LevelRaisingPrimes(f);
+	    // LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
+	end if;
 
     if #LR_nums eq 0 then
 	return "No level raising primes available";
@@ -672,12 +710,14 @@ end function;
 function LoadForm_nonEis(d,str)
 	K := QuadFld(d);
 	ss := Split(str,";");
-	ll := ss[1] cat ";" cat ss[2] cat ";[";
-	for v in ss[3..#ss-2] do
-		ll cat:= v cat ",";
-	end for;
-	ll cat:= ss[#ss-1] cat "];[]";
-	return LoadForm_liftable(d,ll);
+
+	// gathering prime labels 
+	s := Split(Read("data/nonEis_d" cat Sprint(d) cat ".csv"),"\n")[1];
+	pp := s[9..#s-14];
+	PP := [LMFDBIdeal(K,u) : u in Split(pp,";")];
+
+	B := BianchiCohomologySpace(LMFDBIdeal(K,ss[1]),BianchiWeight(K,0,0 : char := StringToInteger(ss[2])));	
+	return ReadClass(str,B,PP);
 end function;
 
 
@@ -754,6 +794,7 @@ function VerifyLMFDBLift(d,str : zealous := false, careful := false)
 end function;
 
 
+// tries to verify a lift at line number `linenum` in the file d*_liftable.csv
 procedure VerifyLift(d,linenum)
 	if linenum eq 1 then
 		print "Table heading contained on line 1, no form to lift";
