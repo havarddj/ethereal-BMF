@@ -30,14 +30,13 @@ def QuadFld(d):
     return F
 
 class HeckeEig():
-    def __init__(self, evals, lvl, p, label=None, is_irrational=False, eig_dim = None, gen_dim = None):
+    def __init__(self, evals, lvl, p, label=None, eig_dim = None, gen_dim = None):
         self.evals = evals
         self.lvl = lvl
         self.prime = p
         self.rational_lifts = []
         self.irrational_lifts = []
         self._label = label
-        self.is_irrational = is_irrational
         self.eig_dim = eig_dim
         self.gen_dim = gen_dim
 
@@ -68,6 +67,9 @@ class HeckeEig():
     def eigenvalues(self):
         return self.evals
 
+    def eigenvalue_list(self):
+        return [v for _,v in self.eigenvalues().items()]
+
     def add_rational_lift(self, lift):
         self.rational_lifts.append(lift)
 
@@ -90,7 +92,7 @@ class HeckeEig():
         return self.irrational_lifts
 
     def is_rational(self):
-        return not self.is_irrational
+        return self.eigenvalue_list()[0].parent().degree() == 1
 
     def eigenspace_dim(self):
         if self.eig_dim:
@@ -103,6 +105,11 @@ class HeckeEig():
             return self.gen_dim
         else:
             return -1
+
+    def is_CM(self):
+        """Check if form is (likely CM) by checking if enough eigenvalues are 0."""
+        evals = list(self.eigenvalues().values())
+        return len([x for x in evals if x == 0])/len(evals) > 1/3
         
     def csv_dict(self):
         if self.has_rational_lift():
@@ -119,6 +126,7 @@ class HeckeEig():
                     'p': self.p(),
                     'eig_dim': self.eigenspace_dim(),
                     'gen_dim': self.generalized_eigenspace_dim(),
+                    'Coeff_minpoly': self.eigenvalue_list()[0].parent().gen().minpoly(),
                     }
 
     def non_LR_primes(self, lift):
@@ -177,8 +185,8 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
     # load mod p BMFs from input_file
     # this is small enough that it doesn't make sense to use an iterator.
     print(f"Loading eigenvalue systems from {input_file}, this might take some time.")
-    modp_evs = [h for h in load_nonEis(d) if h.is_rational()]
-
+    # modp_evs = [h for h in load_nonEis(d) if h.is_rational()]
+    modp_evs = load_nonEis(d)
     max_ev_len = max(len(h.eigenvalues()) for h in modp_evs)
     # extract keys from eigenvalue system
     prime_list = [prime_from_label(K,lab) for lab in modp_evs[0].eigenvalues()]
@@ -188,13 +196,14 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
     hits = BMFs.search({'dimension': 1, "field_label": label}, ['label', 'hecke_eigs', 'level_bad_primes', 'level_label'], limit = SEARCH_COUNT)
     print("Successfully pulled Hecke eigenvalue systems from LMFDB")
 
-    for hit in hits:
+    for hit in hits[:20]:
         hit_lvl = ideal_from_label(K, hit['level_label'])
         hit_ev = hit['hecke_eigs']
 
         for h in modp_evs:
+            # Irrational forms can't have rational lifts;
             # unless we're trying to find all lifts, skip to next once we have a rational lift
-            if not find_all_lifts and h.has_rational_lift():
+            if not h.is_rational() or (not find_all_lifts and h.has_rational_lift()):
                 continue
 
             lvl = h.level()
@@ -252,7 +261,7 @@ def write_congruent_forms(d, modp_evs = None):
     print(f"Wrote liftable eigenvalues and lifts to", f'd{d}_liftable.csv')
 
     with open(f'd{d}_unliftable.csv', 'w', newline='') as f:
-        fieldnames = ['level','p','evals','eig_dim','gen_dim']
+        fieldnames = ['level','p','evals','eig_dim','gen_dim', 'Coeff_minpoly']
         writer = csv.DictWriter(f, delimiter=';', fieldnames=fieldnames)
         writer.writeheader()
         for h in modp_evs:
@@ -317,7 +326,10 @@ def load_unliftable_from_csv(d):
         reader = csv.DictReader(f, delimiter=';')
         for r in reader:
             lvl = ideal_from_label(K, r['level'])
-            modp_evs.append(HeckeEig(eval(r['evals']), lvl, ZZ(r['p']), eig_dim=ZZ(r['eig_dim']), gen_dim=ZZ(r['gen_dim'])))
+            ZZx.<x> = PolynomialRing(ZZ)
+            # eval runs via python? so requires ** instead of ^
+            F.<X1> = NumberField(sage_eval(r['Coeff_minpoly'], locals={'x':x}))
+            modp_evs.append(HeckeEig(sage_eval(r['evals'], locals={'X1':X1}), lvl, ZZ(r['p']), eig_dim=ZZ(r['eig_dim']), gen_dim=ZZ(r['gen_dim'])))
     return modp_evs
 
 def load_liftable_from_csv(d):
@@ -340,16 +352,24 @@ def load_irrat_lifts(d):
     ignoring the ones where we haven't found anything yet."""
     K = QuadFld(d)
     irrat_lifts = []
-    with open(f'../data/irrat_lifts_d{d}.csv') as f:
-        reader = csv.DictReader(f, delimiter=';')
-        for r in reader:
-            if not "No" in r[' lift level']:
-                p = ZZ(r[' prime'])
-                lvl = ideal_from_label(K, r['level'])
-                h = HeckeEig(None, lvl, p)
-                h.add_irrational_lift(r[' lift level'])
-                irrat_lifts.append(h)
+    _ = magma.eval('R<x> := PolynomialRing(Integers())')
 
+    # We need to slice instead of using DictReader because the csv is malformed
+    with open(f'../data/irrat_lifts_d{d}.csv') as f:
+        csv_reader = csv.reader(f, delimiter=';')
+        prime_labels = next(csv_reader)[3:-1]
+        for r in csv_reader:
+            if not "No" in r[2]:
+                E = magma(f'NumberField({r[-1]})')
+                lvl = ideal_from_label(K, r[0])
+                lift_lvl = ideal_from_label(K, r[2])
+                p = ZZ(r[1])
+                good_ps = [lab for lab in prime_labels if ideal_from_label(K, lab).is_coprime(lift_lvl*p)]
+                evals = {lab: E(eval(r[i+3])).sage() for i, lab in enumerate(good_ps)}
+                h = HeckeEig(evals, lvl, 0)
+                irrat_lifts.append(h)
+    # Since we don't store the exact one, we need to match up with nonliftable:
+    
     return irrat_lifts
         
 
