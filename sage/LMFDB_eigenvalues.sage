@@ -196,7 +196,7 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
     hits = BMFs.search({'dimension': 1, "field_label": label}, ['label', 'hecke_eigs', 'level_bad_primes', 'level_label'], limit = SEARCH_COUNT)
     print("Successfully pulled Hecke eigenvalue systems from LMFDB")
 
-    for hit in hits[:20]:
+    for hit in hits:
         hit_lvl = ideal_from_label(K, hit['level_label'])
         hit_ev = hit['hecke_eigs']
 
@@ -312,7 +312,6 @@ def load_nonEis(d):
             if is_valid:
                 modp_evs.append(HeckeEig(
                     evs, lvl, p,
-                    is_irrational= F.Degree() > 1,
                     eig_dim=eig_dim,
                     gen_dim=gen_dim,
                 ))
@@ -490,7 +489,7 @@ def count_l_vs_ul(d, norm_bd=500, p_bd=20, print_unliftable=False):
     if print_unliftable and len(uls) > 0:
         print("Forms without known lift:" + " "*(len(f"{uls[0]}") - 18) + "Irrational?")
         for ev in uls:
-            print(f"{ev}\t {ev.is_irrational}")
+            print(f"{ev}\t {not ev.is_rational()}")
     return len(ls)/(len(ls) + len(uls))
 
     
