@@ -1,7 +1,7 @@
 # Uses lmfdb lite, see https://github.com/roed314/lmfdb-lite
 # Make sure to install via sage's own pip:
 # sage -pip install -U "lmfdb-lite[pgbinary] @ git+https://github.com/roed314/lmfdb-lite.git"
-
+# and tabulate: sage -pip install -U tabulate
 
 from lmf import db
 # Stolen from lmfdb - used for sorting ideals
@@ -538,3 +538,37 @@ def count_single_prime_lifts(d):
         newlvl = level_from_BMF_label(F, h.get_rational_lifts()[0])/h.level()
         return newlvl.is_prime() and newlvl.is_coprime(h.p())
     return len([h for h in ls if is_good(h)])/len(ls)
+
+def liftable_statistics():
+    from tabulate import tabulate
+    def make_table(lifts):
+        return [["Ethereal forms total:", len(lifts)],
+                    ["Ethereal forms with lift:", len([h for h in lifts if h.has_lift()])],
+                    ["Ethereal Forms with no lift:", len([h for h in lifts if not h.has_lift()])],
+                    ["Fp-valued forms total:", len([h for h in lifts if h.is_rational()])],
+                    ["Fp-valued forms with rational lift:", len([h for h in lifts if h.is_rational() and h.has_rational_lift()])],
+                    ["Fp-valued forms with irrational lift:", len([h for h in lifts if h.is_rational() and h.has_irrational_lift()])],
+                    ["Fp-valued forms with lift (total):", len([h for h in lifts if h.is_rational() and h.has_lift()])],
+                    ["Fp-valued forms with no lift:", len([h for h in lifts if not h.has_lift() and h.is_rational()])],
+                ]
+    total_lifts = []
+    total_small_lifts = []
+    total_small_p_lifts = []
+    for d in [1,2,3,7,11]:
+        all_lifts = load_all_from_csv(d)
+        small_p_lifts = [h for h in all_lifts if 2 < h.p() < 20]
+        small_lifts = [h for h in all_lifts if 2 < h.p() < 20 and h.level().norm() <= 500]
+        total_lifts += all_lifts
+        total_small_p_lifts += small_p_lifts
+        total_small_lifts += small_lifts
+        print("\n")
+        print(tabulate(make_table(all_lifts), headers=[f"d={d}, no conditions", "Count"], tablefmt="grid"), "\n")
+        print(tabulate(make_table(small_p_lifts), headers=[f"d={d}, 2 < p < 20", "Count"], tablefmt="simple_grid"))
+        print(tabulate(make_table(small_lifts), headers=[f"d={d}, 2 < p < 20, Nm(n) <= 500", "Count"], tablefmt="simple_grid"))
+        print("\n")
+    print("\n")
+    print(tabulate(make_table(total_lifts), headers=[f"All d, no conditions", "Count"], tablefmt="double_grid"), "\n")
+    print(tabulate(make_table(total_small_p_lifts), headers=[f"All d, 2 < p < 20", "Count"], tablefmt="double_grid"))
+    print(tabulate(make_table(total_small_lifts), headers=[f"All d, 2 < p < 20, Nm(n) <= 500", "Count"], tablefmt="double_grid"))
+    print("\n")
+    
