@@ -35,48 +35,47 @@ function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
 end function;
 
 
-function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, from_data := false, storeForms := true)
-	// the `from_data` parameter lets us use level-raise primes we might have computed up to a larger bound.
-	if from_data then
-		K := Parent(f)`field;
-		ZK := MaximalOrder(K);
-		dd := Discriminant(K);
-		if dd mod 4 eq 0 then
-			dd := dd div 4;
-		end if;
-		p := Characteristic(Parent(f));
-		level := Level(f);
-		// TODO: change this when we store data in one csv file rather than many files  
-		f_file := "data/LR/" cat Sprint(-dd) cat "/" cat LMFDBLabel(level) cat "_" cat Sprint(p);
-		labels := Split(Read(f_file));
-		LR_primes := [LMFDBIdeal(K,str) : str in labels] cat [f[1] : f in Factorization(level*p)];
-		LR_nums := [1*ZK];
-		
-		to_add := LR_primes;
-
-		// we keep adding (up to the bound) until there's nothing left to add
-		while #to_add ne 0 do 
-			new_to_add := [];
-			for I in LR_nums do 
-				for J in to_add do 
-					if Norm(I*J*level) le lvlUpperBd and not I*J in LR_nums then 
-						Append(~LR_nums,I*J);
-						Append(~new_to_add,J);
-					end if;
-				end for;
-			end for;
-			to_add := new_to_add;
-		end while;
-		Remove(~LR_nums,1);
-
-		nn := [Norm(u) : u in LR_nums];
-		ParallelSort(~nn,~LR_nums);
-
-	else 
-	    LR_nums := LevelRaiseFactors(f, Min(Floor(lvlUpperBd/Norm(Level(f))), 4000));
-	    // LR_nums := LevelRaisingPrimes(f);
-	    // LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
+function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, from_data := false, heckeBd := 100)
+    // the `from_data` parameter lets us use level-raise primes we might have computed up to a larger bound.
+    if from_data then
+	K := Parent(f)`field;
+	ZK := MaximalOrder(K);
+	dd := Discriminant(K);
+	if dd mod 4 eq 0 then
+	    dd := dd div 4;
 	end if;
+	p := Characteristic(Parent(f));
+	level := Level(f);
+	// TODO: change this when we store data in one csv file rather than many files  
+	f_file := "data/LR/" cat Sprint(-dd) cat "/" cat LMFDBLabel(level) cat "_" cat Sprint(p);
+	labels := Split(Read(f_file));
+	LR_primes := [LMFDBIdeal(K,str) : str in labels] cat [f[1] : f in Factorization(level*p)];
+	LR_nums := [1*ZK];
+
+	to_add := LR_primes;
+
+	// we keep adding (up to the bound) until there's nothing left to add
+	while #to_add ne 0 do 
+	    new_to_add := [];
+		for I in LR_nums do 
+		    for J in to_add do 
+			if Norm(I*J*level) le lvlUpperBd and not I*J in LR_nums then 
+			    Append(~LR_nums,I*J);
+			    Append(~new_to_add,J);
+			end if;
+		    end for;
+		end for;
+		to_add := new_to_add;
+	end while;
+	Remove(~LR_nums,1);
+
+	nn := [Norm(u) : u in LR_nums];
+	ParallelSort(~nn,~LR_nums);
+    else 
+	LR_nums := LevelRaiseFactors(f, Min(Floor(lvlUpperBd/Norm(Level(f))), 4000));
+	// LR_nums := LevelRaisingPrimes(f);
+	// LR_nums cat:= [P[1] : P in Factorization(Parent(f)`level * Characteristic(Parent(f)))];
+    end if;
 
     if #LR_nums eq 0 then
 	return "No level raising primes available";
@@ -110,8 +109,9 @@ function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, f
     // Caching is supposed to speed this up by storing eigenforms
     // see https://magma.maths.usyd.edu.au/magma/handbook/text/1784#20376
     // The main utility of this is when you're accessing the same space several times.
-    SetStoreModularForms(K, storeForms);
+    // SetStoreModularForms(K, storeForms);
     // print "Factors are", [LMFDBLabel(I) : I in LR_nums];
+    primes := SortByLMFDBLabel(PrimesUpTo(heckeBd, K));
     for I in LR_nums do
 	level2 := I*level1;
 	if Norm(level2) gt lvlUpperBd or Norm(level2) lt lvlLowerBd then
@@ -120,29 +120,18 @@ function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, f
 	end if;
 	_, princ := IsPrincipal(I);
 	print "Looking for lifts with level", LMFDBLabel(I), "=", K!princ, "added; new level is", LMFDBLabel(level2);
-	// print "Can kill lifting obstruction?", CanKillLiftingObstr(p, level2,level1);
-	// B0 := BianchiCohomologySpace(level2, W0);
-	// Bp := BianchiCohomologySpace(level2, Wp);
-	// red_map := ReductionModPMap(B0,Bp);
-	// reduction := [Bp`down(red_map((Inverse(B0`down)(v)))) : v in Basis(B0`forms)];
-	// oldspace := DegenerateSubspace(f, Bp);
-        // inter := sub<Bp`forms | reduction> meet oldspace;
 
-	// if Dimension(inter) gt 0 then
-	//     print "Found intersection of oldspace and reduction mod p in level", LMFDBLabel(level2);
-	// end if;
-	primes := SortByLMFDBLabel(Setseq(Keys(Eigenvalues(f))));
-	primes := [qq : qq in primes | IsCoprime(qq,level2)];
 	C := BianchiCuspForms(K, level2);
 	if Dimension(C) eq 0 then
 	    print "Characteristic 0 space empty";
 	    continue;
 	end if;
-	// Test small Hecke operator:
-	qq1 := primes[1];
-	ev1 := Eigenvalue(f,qq1);
-	Phi := MinimalPolynomial(HeckeOperator(C,qq1));
+	goodPrimes := [qq : qq in primes | IsCoprime(qq, level2)];
 	
+	// Test small Hecke operator:
+	qq1 := goodPrimes[1];
+	ev1 := Eigenvalue(f, qq1);
+	Phi := MinimalPolynomial(HeckeOperator(C,qq1));
 	if Evaluate(ChangeRing(Phi, Parent(ev1)), ev1) ne 0 then
 	    print "Eigenvalue of", LMFDBLabel(qq1), "is not a root of char 0 Hecke polynomial; evaluates to", Evaluate(ChangeRing(Phi, Parent(ev1)), ev1);
 	    continue;
@@ -155,9 +144,9 @@ function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, f
 	for j -> F in NewformDecomposition(NewSubspace(C)) do
 	    print "Testing eigenform", j;
 	    // Compute first Hecke eigenvalue to find field
-	    E := Parent(HeckeEigenvalue(Eigenform(F), primes[1]));
+	    E := Parent(HeckeEigenvalue(Eigenform(F), goodPrimes[1]));
 	    if Degree(E) gt 1 then
-		E<z> := Parent(HeckeEigenvalue(Eigenform(F), primes[1]));
+		E<z> := Parent(HeckeEigenvalue(Eigenform(F), goodPrimes[1]));
 	    else
 		z := Rationals()!1;
 	    end if;
@@ -217,7 +206,7 @@ function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, f
 		    is_wrong := false;
 		    print "Testing automorphism", aut_no;
 		    i := emb*aut;
-		    for qq in primes do
+		    for qq in goodPrimes do
 			_, qq_gen := IsPrincipal(qq);
 			
 			if i(Eigenvalue(f,qq)) ne phi(HeckeEigenvalue(Eigenform(F), qq)) then
@@ -239,15 +228,14 @@ function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, f
 		    if not is_wrong then 
 			print "Found correct form!";
 			printf "Using prime above %o corresponding to mod p factor %o of minimal polynomial %o\n", p, EmodpPol, MinimalPolynomial(z);
-			colNum := #primes;
-			labels := ["$\\mathfrak{p}$"] cat [Sprint(LMFDBLabel(pp)) : pp in primes[1..colNum]];
-			fp_evals := ["$a_{\\mathfrak{p}}(f)$"] cat ListToEquationStrings([i(Eigenvalue(f,pp)) : pp in primes[1..colNum]]);
-			Fp_evals := ["$a_{\\mathfrak{p}}(F) \\mod p$"] cat ListToEquationStrings([phi(HeckeEigenvalue(Eigenform(F),pp)) : pp in primes[1..colNum]]); 
-			F_evals := ["$a_{\\mathfrak{p}}(F)$"] cat ListToEquationStrings([HeckeEigenvalue(Eigenform(F),pp) : pp in primes[1..colNum]]);
-			print ListsToLatexTable([labels,fp_evals,Fp_evals, F_evals]);
-			return [LMFDBLabel(Level(F)) ] cat
-			 [Sprint(Eltseq(HeckeEigenvalue(Eigenform(F), pp))) : pp in primes] cat
-			 [Sprint(DefiningPolynomial(E))];
+			A := AssociativeArray();
+			A["lift_level"] := LMFDBLabel(Level(F));
+			A["Coeff_minpoly"] := Sprint(DefiningPolynomial(E));
+			for pp in primes do
+			    // Can only compute eigenvalues coprime to level in magma; so we pad with 0 (MAYBE: better default?)
+			    A[LMFDBLabel(pp)] := IsCoprime(pp, Level(F)) select Sprint(Eltseq(HeckeEigenvalue(Eigenform(F), pp))) else "0";
+			    end for;
+			return A;
 		    end if;
 
 		end for;
@@ -259,6 +247,7 @@ function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, f
     end for;
     return "None found";
 end function;
+
 
 
 
@@ -274,36 +263,36 @@ where
 - the rest of the entries correspond to Hecke eigenvalues
 */
 
-function BatchFindIrrationalLifts(d : lvlUpperBd := 100)
-    F := QuadFld(d);
-    filename := "data/nonEis_d" cat Sprint(d) cat ".csv";
-    lines := Split(Read(filename), "\n");
-    header := Split(lines[1], ";");
-    primeLabels := header[3..#header-1];
-    primeList := [LMFDBIdeal(F,label) : label in primeLabels];
+// function BatchFindIrrationalLifts(d : lvlUpperBd := 100)
+//     F := QuadFld(d);
+//     filename := "data/nonEis_d" cat Sprint(d) cat ".csv";
+//     lines := Split(Read(filename), "\n");
+//     header := Split(lines[1], ";");
+//     primeLabels := header[3..#header-1];
+//     primeList := [LMFDBIdeal(F,label) : label in primeLabels];
 
-    for line in lines[2..#lines] do
-	entries := Split(line, ";");
-	if "x" notin entries[#entries] or forall{ 1 : e in entries[3..#entries-1] | "[" notin e} then
-	    continue;
-	end if;
+//     for line in lines[2..#lines] do
+// 	entries := Split(line, ";");
+// 	if "x" notin entries[#entries] or forall{ 1 : e in entries[3..#entries-1] | "[" notin e} then
+// 	    continue;
+// 	end if;
 
-	lvl := LMFDBIdeal(F, entries[1]);
-	p := StringToInteger(entries[2]);
-	// skip small primes
-	if p eq 2 then continue; end if;
+// 	lvl := LMFDBIdeal(F, entries[1]);
+// 	p := StringToInteger(entries[2]);
+// 	// skip small primes
+// 	if p eq 2 then continue; end if;
 	
-	B := BianchiCohomologySpace(lvl, BianchiWeight(F,0,0 : char :=p));
-	f := ReadClass(line, B, primeList);
-	print "Finding lifts for", f, "; this may take time";
-	f0 := FindLifts(f : lvlUpperBd := lvlUpperBd, at_p := true);
-	if Type(f0) eq Type("Foo") then
-	    print f0;
-	    // print "++++FOUND LIFT++++", f0;
-	end if;
-    end for;
-    return 0;
-end function;
+// 	B := BianchiCohomologySpace(lvl, BianchiWeight(F,0,0 : char :=p));
+// 	f := ReadClass(line, B, primeList);
+// 	print "Finding lifts for", f, "; this may take time";
+// 	f0 := FindLifts(f : lvlUpperBd := lvlUpperBd, at_p := true);
+// 	if Type(f0) eq Type("Foo") then
+// 	    print f0;
+// 	    // print "++++FOUND LIFT++++", f0;
+// 	end if;
+//     end for;
+//     return 0;
+// end function;
 
 
 /*
@@ -353,10 +342,11 @@ function CanKillLiftingObstr(p, I,J)
     end if;
 end function;
 
-function CheckNonrationalLift(F, line, topLine : extended := false, lvlLowerBd :=0, lvlUpperBd := 10000, recompute := false, HeckeBd := 200)
+function CheckNonrationalLift(F, line, topLine : lvlLowerBd :=0, lvlUpperBd := 10000, recompute := false, heckeBd := 200)
     lvl := Split(line, ";")[1];
     topList := Split(topLine, ";");
-    primeList := topList[3..#topList-1];
+    primeList := topList[3..#topList-3];
+    print(primeList);
     p := StringToInteger(Split(line, ";")[2]);
     B := BianchiCohomologySpace(LMFDBIdeal(F, lvl), BianchiWeight(F,0,0 : char := p));
     
@@ -365,8 +355,7 @@ function CheckNonrationalLift(F, line, topLine : extended := false, lvlLowerBd :
     f := ReadClass(line, B, [LMFDBIdeal(F, I) : I in primeList]);
     print "Initialized class; looking for lifts";
     if recompute then
-	print "Recomputing Hecke eigenvalues with Hecke bound", HeckeBd;
-	SetHeckeBound(B, HeckeBd);
+	print "Recomputing Hecke eigenvalues with Hecke bound", heckeBd;
 	ComputeHeckeOperators(B);
 	// extract correct recomputed eigenform
 	// necessary because f doesn't have a vector (iirc)
@@ -379,18 +368,8 @@ function CheckNonrationalLift(F, line, topLine : extended := false, lvlLowerBd :
 	end for;
     end if;
 
-    if not extended then
-	return FindLifts(f : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd);
-    end if;
+    return FindLifts(f : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd, heckeBd := heckeBd), f;
     
-    fLift := FindLifts(f : lvlLowerBd := lvlLowerBd, lvlUpperBd := lvlUpperBd);
-
-    newLvl := Level(fLift);
-    B := BianchiCohomologySpace(newLvl, BianchiWeight(BaseField(fLift),0,0 : char := p));
-    SetHeckeBound(B, 50);
-    efs := Eigenforms(B);
-    print "Exists multiplicity 2 mod p eigenspace of this level?", exists{ef : ef in efs | ef`eigenspaceDim eq 2};
-    return fLift;
     
 end function;
 
@@ -481,17 +460,17 @@ eigenvalues up to norm 100.
 
 The output is stored in "./data/irrat_lifts_dX.csv". If no lift is found, it will write the output from FindLifts, telling you if the problem was that no lifts were found, or if there were no level raising primes. 
 */
-function LookForLMFDBUnliftable(d : liftLvlLowerBd :=0, liftLvlUpperBd := 10000, recompute := false, lvlMin := 0, lvlMax := 1000)
+function LookForLMFDBUnliftable(d : liftLvlLowerBd :=0, liftLvlUpperBd := 10000, recompute := false, heckeBd := 100, lvlMin := 0, lvlMax := 1000)
     F := QuadFld(d);		// NB: Caching this lets us cache char 0 eigenforms.
     input := "data/lmfdbNonlift_d" cat Sprint(d) cat ".csv";
-    output := "data/irrat_lifts_d" cat Sprint(d) cat ".csv";
+    output := "data/irrat_lifts_d" cat Sprint(d) cat "_v2.csv";
     lines := Split(Read(input), "\n");
     topLine := lines[1];
     topElts := Split(topLine, ";");
     if Read(output) eq "" then 
 	fprintf output, "level; prime; lift level;" cat Join(topElts[3..#topElts], ";") cat "\n";
     end if;
-    
+    primeLabels := topElts[3..#topElts -3];
     // Helper function: has a lift for this line already been recorded?
     HasFoundLift := function(line, output)
 	existingLines := Split(Read(output), "\n");
@@ -522,10 +501,20 @@ function LookForLMFDBUnliftable(d : liftLvlLowerBd :=0, liftLvlUpperBd := 10000,
 	end if;
 	
 	print "Looking for lifts of line", line;
-	res := CheckNonrationalLift(F, line, topLine : lvlLowerBd := liftLvlLowerBd, lvlUpperBd := liftLvlUpperBd, recompute := recompute);
+	// Returns assarray with eigenvalues (as strings) and metadata;
+	res := CheckNonrationalLift(F, line, topLine : lvlLowerBd := liftLvlLowerBd, lvlUpperBd := liftLvlUpperBd, recompute := recompute, heckeBd := heckeBd);
 	
-	if Type(res) eq SeqEnum then
-	    resultLine := Join(res, ";") ;
+	if Type(res) eq Assoc then
+	    resultLine := res["lift_level"] cat ";";
+	    for lab in primeLabels do
+		if lab notin Keys(res) then
+		    print "WARNING label", lab, "not found";
+		end if;
+	    end for;
+		
+	    resultLine cat:= Join([res[lab] : lab in primeLabels], ";");
+	    resultLine cat:= ";" cat res["Coeff_minpoly"];
+	    
 	else
 	    resultLine := Sprint(res);
 	end if;
@@ -543,6 +532,7 @@ function LookForLMFDBUnliftable(d : liftLvlLowerBd :=0, liftLvlUpperBd := 10000,
 end function;
 
 function LookForAllIrrational(d)
+    print "WARNING: this function is old and not adapted to the new format. Do not expect it to work";
     F := QuadFld(d);
     input := "data/nonEis_d" cat Sprint(d) cat ".csv";
     output := "data/irrat_lifts_d" cat Sprint(d) cat ".csv";
