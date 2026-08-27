@@ -3,7 +3,7 @@
 # sage -pip install -U "lmfdb-lite[pgbinary] @ git+https://github.com/roed314/lmfdb-lite.git"
 # and tabulate: sage -pip install -U tabulate
 
-from lmf import db
+from tabulate import tabulate
 # Stolen from lmfdb - used for sorting ideals
 from psort import primes_iter, prime_label, prime_from_label, ideal_label, ideal_from_label
 import re
@@ -63,6 +63,9 @@ class HeckeEig():
 
     def p(self):
         return self.prime
+
+    def d(self):
+        return squarefree_part(-self.field().discriminant())
     
     def eigenvalues(self):
         return self.evals
@@ -91,6 +94,9 @@ class HeckeEig():
     def get_irrational_lifts(self):
         return self.irrational_lifts
 
+    def get_lifts(self):
+        return self.get_rational_lifts() + self.get_irrational_lifts()
+
     def is_rational(self):
         return self.eigenvalue_list()[0].parent().degree() == 1
 
@@ -112,7 +118,44 @@ class HeckeEig():
     def good_primes(self):
         p = self.p()
         return [lab for lab in self.eigenvalues() if ideal_from_label(self.field(), lab).is_coprime(self.level() * (p if p != 0 else 1))]
-        
+
+    def tabulate_lift_evals(self, tablefmt="simple_grid", horizontal=False):
+        """
+        Return a table with the eigenvalues of form and its lifts
+        """
+        if self.get_irrational_lifts() == []:
+            return "No irrational lifts; rational lifts not currently supported."
+        lifts = self.get_lifts()
+        F = self.field()
+        p = self.p()
+        Eself = self.coefficient_field()
+        print(f"Table of lifts of {self} over Q(\sqrt(-{self.d()}))")
+        for lift in lifts:
+            E = lift.coefficient_field()
+            # for pretty printing:
+            E.<w> = E.change_names()
+            cands = [pp for (pp, _) in E.ideal(p).factor() ]
+            print(f"Splitting behavior of p={p} in Hecke field: (Nm, f, e)", [(pp.norm(), pp.residue_class_degree(), pp.ramification_index()) for (pp,_) in E.ideal(p).factor()])
+            for pp in cands:
+                assert pp.is_principal()
+                pp_gen = pp.gens_reduced()[0]
+                Epp = E.residue_field(pp)
+                for phi in Eself.Hom(Epp):
+                    good_labels = [lab for lab in lift.good_primes() if ideal_from_label(F, lab).is_coprime(F.ideal(p))]
+                    if all([phi(e) == Epp(lift.eigenvalues()[lab]) for (lab,e) in self.eigenvalues().items() if lab in good_labels]):
+                        print(f"Found correct ideal, reducing mod {pp_gen}")
+                        print(f"Lift has level {lift.level_label()} = {[(ideal_label(pp), m) for (pp,m) in lift.level().factor()]}")
+                        print("Hecke eigenvalues defined over", E, "of discriminant", E.discriminant(), "=", E.discriminant().factor())
+                        table = [[lab + ("*" if lab not in good_labels else ""),
+                                  self.eigenvalues()[lab],
+                                  Epp(lift.eigenvalues()[lab]),
+                                  E(lift.eigenvalues()[lab]),
+                                  ] for lab in self.eigenvalues()]
+                        print(tabulate(table, tablefmt=tablefmt, headers=["$\p$",
+                                                                   "$a_{\p}(f)$",
+                                                                   f"$a_{{\p}}(F) \Mod {pp_gen}$",
+                                                                   "$a_{\p}(F)$",
+                                                                          ]))
 
     def is_CM(self):
         """Check if form is (likely CM) by checking if enough eigenvalues are 0."""
@@ -181,6 +224,8 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
     Returns list of hecke eigenvalue objects, whose field `rational_lifts` is populated
     with rational lifts, in the form of a tuple (label, evs, level)
     """
+    # Place import here to improve loading speed of script
+    from lmf import db
 
     R.<x> = PolynomialRing(ZZ)
     K = QuadFld(d)
@@ -428,15 +473,19 @@ def is_irrational_lift(h, g):
 
 def load_all_from_csv(d):
     """
-    Load liftable and unliftable forms, including those where we haven't found lifts yet.
+    Load liftable and unliftable forms over field Q(sqrt{-d}), including those where we haven't found lifts yet.
     """
-    # first, collect forms from three different sources
     lifties = load_liftable_from_csv(d)
     unlifties = load_unliftable_from_csv(d)
     _ = load_irrat_lifts(d, modp_evs = unlifties)
     
     return lifties + unlifties
 
+def load_forms_all_d():
+    """
+    Load all forms across all fields.
+    """
+    return sum([load_all_from_csv(d) for d in [1,2,3,7,11]], [])
     
 def ul_filter_csv(d):
     """
@@ -476,7 +525,6 @@ def ul_filter_csv(d):
     with open(output_file, "w") as f:
         f.write("\n".join(lines))
     print(f"Wrote unliftable forms to {output_file}")
-    
 
 def ul_print_LR_primes(d):
     F = QuadFld(d)
@@ -540,35 +588,89 @@ def count_single_prime_lifts(d):
     return len([h for h in ls if is_good(h)])/len(ls)
 
 def liftable_statistics():
-    from tabulate import tabulate
-    def make_table(lifts):
-        return [["Ethereal forms total:", len(lifts)],
-                    ["Ethereal forms with lift:", len([h for h in lifts if h.has_lift()])],
-                    ["Ethereal Forms with no lift:", len([h for h in lifts if not h.has_lift()])],
-                    ["Fp-valued forms total:", len([h for h in lifts if h.is_rational()])],
-                    ["Fp-valued forms with rational lift:", len([h for h in lifts if h.is_rational() and h.has_rational_lift()])],
-                    ["Fp-valued forms with irrational lift:", len([h for h in lifts if h.is_rational() and h.has_irrational_lift()])],
-                    ["Fp-valued forms with lift (total):", len([h for h in lifts if h.is_rational() and h.has_lift()])],
-                    ["Fp-valued forms with no lift:", len([h for h in lifts if not h.has_lift() and h.is_rational()])],
+    def make_table(forms):
+        return [["Ethereal forms total:", len(forms)],
+                    ["Ethereal forms with lift:", len([h for h in forms if h.has_lift()])],
+                    ["Ethereal Forms with no lift:", len([h for h in forms if not h.has_lift()])],
+                    ["Fp-valued forms total:", len([h for h in forms if h.is_rational()])],
+                    ["Fp-valued forms with rational lift:", len([h for h in forms if h.is_rational() and h.has_rational_lift()])],
+                    ["Fp-valued forms with irrational lift:", len([h for h in forms if h.is_rational() and h.has_irrational_lift()])],
+                    ["Fp-valued forms with lift (total):", len([h for h in forms if h.is_rational() and h.has_lift()])],
+                    ["Fp-valued forms with no lift:", len([h for h in forms if not h.has_lift() and h.is_rational()])],
                 ]
-    total_lifts = []
-    total_small_lifts = []
-    total_small_p_lifts = []
+    total_forms = []
+    total_small_forms = []
+    total_small_p_forms = []
     for d in [1,2,3,7,11]:
-        all_lifts = load_all_from_csv(d)
-        small_p_lifts = [h for h in all_lifts if 2 < h.p() < 20]
-        small_lifts = [h for h in all_lifts if 2 < h.p() < 20 and h.level().norm() <= 500]
-        total_lifts += all_lifts
-        total_small_p_lifts += small_p_lifts
-        total_small_lifts += small_lifts
+        all_forms = load_all_from_csv(d)
+        small_p_forms = [h for h in all_forms if 2 < h.p() < 20]
+        small_forms = [h for h in all_forms if 2 < h.p() < 20 and h.level().norm() <= 500]
+        total_forms += all_forms
+        total_small_p_forms += small_p_forms
+        total_small_forms += small_forms
         print("\n")
-        print(tabulate(make_table(all_lifts), headers=[f"d={d}, no conditions", "Count"], tablefmt="grid"), "\n")
-        print(tabulate(make_table(small_p_lifts), headers=[f"d={d}, 2 < p < 20", "Count"], tablefmt="simple_grid"))
-        print(tabulate(make_table(small_lifts), headers=[f"d={d}, 2 < p < 20, Nm(n) <= 500", "Count"], tablefmt="simple_grid"))
+        print(tabulate(make_table(all_forms), headers=[f"d={d}, no conditions", "Count"], tablefmt="grid"), "\n")
+        print(tabulate(make_table(small_p_forms), headers=[f"d={d}, 2 < p < 20", "Count"], tablefmt="simple_grid"))
+        print(tabulate(make_table(small_forms), headers=[f"d={d}, 2 < p < 20, Nm(n) <= 500", "Count"], tablefmt="simple_grid"))
         print("\n")
     print("\n")
-    print(tabulate(make_table(total_lifts), headers=[f"All d, no conditions", "Count"], tablefmt="double_grid"), "\n")
-    print(tabulate(make_table(total_small_p_lifts), headers=[f"All d, 2 < p < 20", "Count"], tablefmt="double_grid"))
-    print(tabulate(make_table(total_small_lifts), headers=[f"All d, 2 < p < 20, Nm(n) <= 500", "Count"], tablefmt="double_grid"))
+    print(tabulate(make_table(total_forms), headers=[f"All d, no conditions", "Count"], tablefmt="double_grid"), "\n")
+    print(tabulate(make_table(total_small_p_forms), headers=[f"All d, 2 < p < 20", "Count"], tablefmt="double_grid"))
+    print(tabulate(make_table(total_small_forms), headers=[f"All d, 2 < p < 20, Nm(n) <= 500", "Count"], tablefmt="double_grid"))
     print("\n")
-    
+    eigen_table = [["Ethereal forms with multiplicity >1:", len([h for h in all_forms if h.eigenspace_dim() > 1])],
+                   ["Ethereal forms with extra generalized eigenspace:", len([h for h in all_forms if h.generalized_eigenspace_dim() > h.eigenspace_dim()])],
+                   ["Ethereal forms with extra generalized eigenspace, p>3:", len([h for h in all_forms if h.generalized_eigenspace_dim() > h.eigenspace_dim() and h.p() > 3])],
+                   ]
+    print(tabulate(eigen_table))
+
+def big_prime_example(tablefmt="simple_grid"):
+    """
+    Print eigenvalue table for mod 379 lift, with char 0 eigenvalues coerced to cyclotomic field
+    """
+    h = [h for h in load_all_from_csv(7) if h.p() >300 and h.has_lift()][0]
+    print(h)
+    if not h.has_irrational_lift():
+        return "No irrational lifts; rational lifts not currently supported."
+    lift = h.get_irrational_lifts()[0]
+    F = h.field()
+    p = h.p()
+    Eself = h.coefficient_field()
+    print(f"Table of lifts of {h} over Q(\sqrt(-{h.d()}))")
+    E2 = lift.coefficient_field()
+    L.<zeta7> = NumberField(cyclotomic_polynomial(7))
+    E = [E for (E,_,_) in L.subfields() if E.is_isomorphic(E2)][0]
+    i = E2.Hom(E)[0]
+    cands = [pp for (pp, _) in E.ideal(p).factor() ]
+    print(f"Splitting behavior of p={p} in Hecke field: (Nm, f, e)", [(pp.norm(), pp.residue_class_degree(), pp.ramification_index()) for (pp,_) in E.ideal(p).factor()])
+    for pp in cands:
+        assert pp.is_principal()
+        pp_gen = pp.gens_reduced()[0]
+        Epp = E.residue_field(pp)
+        for phi in Eself.Hom(Epp):
+            good_labels = [lab for lab in lift.good_primes() if ideal_from_label(F, lab).is_coprime(F.ideal(p))]
+            if all([phi(e) == Epp(i(lift.eigenvalues()[lab])) for (lab,e) in h.eigenvalues().items() if lab in good_labels]):
+                print(f"Found correct ideal, reducing mod {pp_gen}")
+                print(f"Lift has level {lift.level_label()} = {[(ideal_label(pp), m) for (pp,m) in lift.level().factor()]}")
+                print("Hecke eigenvalues defined over", E, "of discriminant", E.discriminant(), "=", E.discriminant().factor())
+                table = [[lab + ("*" if lab not in good_labels else ""),
+                            h.eigenvalues()[lab],
+                            Epp(i(lift.eigenvalues()[lab])),
+                            E(i(lift.eigenvalues()[lab])),
+                            ] for lab in h.eigenvalues()]
+                print(tabulate(table, tablefmt=tablefmt, headers=["$\p$",
+                                                            "$a_{\p}(f)$",
+                                                            f"$a_{{\p}}(F) \Mod {pp_gen}$",
+                                                            "$a_{\p}(F)$",
+                                                                    ]))
+    return 1
+                
+
+def big_field_example():
+    """
+    Print eigenvalue table of large degree
+    """
+    evs = load_all_from_csv(7) 
+    h = [h for h in evs if len([l for l in h.get_irrational_lifts() if l.coefficient_field().degree() >= 7]) > 0][0]
+
+    return h.tabulate_lift_evals()
