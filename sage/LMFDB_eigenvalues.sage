@@ -638,10 +638,10 @@ def big_prime_example(tablefmt="simple_grid"):
     Eself = h.coefficient_field()
     print(f"Table of lifts of {h} over Q(\sqrt(-{h.d()}))")
     E2 = lift.coefficient_field()
-    L.<zeta7> = NumberField(cyclotomic_polynomial(7))
-    E = [E for (E,_,_) in L.subfields() if E.is_isomorphic(E2)][0]
-    i = E2.Hom(E)[0]
-    cands = [pp for (pp, _) in E.ideal(p).factor() ]
+    L.<zeta7> = CyclotomicField(7, embedding=None)
+    E = L
+    i = E2.embeddings(L)[0]    
+    cands = [pp for (pp, _) in E.ideal(p).factor() if pp.residue_class_degree() == 1]
     print(f"Splitting behavior of p={p} in Hecke field: (Nm, f, e)", [(pp.norm(), pp.residue_class_degree(), pp.ramification_index()) for (pp,_) in E.ideal(p).factor()])
     for pp in cands:
         assert pp.is_principal()
@@ -652,19 +652,19 @@ def big_prime_example(tablefmt="simple_grid"):
             if all([phi(e) == Epp(i(lift.eigenvalues()[lab])) for (lab,e) in h.eigenvalues().items() if lab in good_labels]):
                 print(f"Found correct ideal, reducing mod {pp_gen}")
                 print(f"Lift has level {lift.level_label()} = {[(ideal_label(pp), m) for (pp,m) in lift.level().factor()]}")
-                print("Hecke eigenvalues defined over", E, "of discriminant", E.discriminant(), "=", E.discriminant().factor())
+                print("Hecke eigenvalues defined over", E2, "of discriminant", E2.discriminant(), "=", E2.discriminant().factor())
                 table = [[lab + ("*" if lab not in good_labels else ""),
                             h.eigenvalues()[lab],
                             Epp(i(lift.eigenvalues()[lab])),
                             E(i(lift.eigenvalues()[lab])),
                             ] for lab in h.eigenvalues()]
                 print(tabulate(table, tablefmt=tablefmt, headers=["$\p$",
-                                                            "$a_{\p}(f)$",
-                                                            f"$a_{{\p}}(F) \Mod {pp_gen}$",
-                                                            "$a_{\p}(F)$",
-                                                                    ]))
+                                                                  "$a_{\p}(f)$",
+                                                                  f"$a_{{\p}}(F) \Mod {pp_gen}$",
+                                                                  "$a_{\p}(F)$",
+                                                                  ]))
     return 1
-                
+
 
 def big_field_example():
     """
@@ -674,3 +674,10 @@ def big_field_example():
     h = [h for h in evs if len([l for l in h.get_irrational_lifts() if l.coefficient_field().degree() >= 7]) > 0][0]
 
     return h.tabulate_lift_evals()
+
+
+def count_LMFDB_lifts():
+    for d in [1,2,3,7,11]:
+        evs = load_liftable_from_csv(d)
+        print("Total number of forms:", len(evs))
+    
