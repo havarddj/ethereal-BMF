@@ -1,7 +1,8 @@
 # Uses lmfdb lite, see https://github.com/roed314/lmfdb-lite
 # Make sure to install via sage's own pip:
-# sage -pip install -U "lmfdb-lite[pgbinary] @ git+https://github.com/roed314/lmfdb-lite.git"
-# and tabulate: sage -pip install -U tabulate
+# sage -pip install -U "lmfdb-lite[pgbinary] @ git+https://github.com/roed314/lmfdb-lite.git@4c4262b60b6ae8a9c6f33771ae4e939637d95741"
+# and tabulate:
+# sage -pip install -U tabulate
 
 from tabulate import tabulate
 # Stolen from lmfdb - used for sorting ideals
@@ -30,7 +31,7 @@ def QuadFld(d):
     return F
 
 class HeckeEig():
-    def __init__(self, evals, lvl, p, label=None, eig_dim = None, gen_dim = None):
+    def __init__(self, evals, lvl, p, label=None, eig_dim = None, gen_dim = None, source = None):
         self.evals = evals
         self.lvl = lvl
         self.prime = p
@@ -39,7 +40,22 @@ class HeckeEig():
         self._label = label
         self.eig_dim = eig_dim
         self.gen_dim = gen_dim
+        # For a char. 0 lift: the (level, p) of the mod p form it lifts
+        # in ../data/irrat_lifts_d*_v2.csv.
+        self.source = source
 
+    def conjugate_form(self):
+        """
+        Initialize conjugate form (WARN: does not copy lifts or other invariants)
+        """
+        K = self.field()
+        c = [c for c in K.automorphisms() if c(K.gen()) != K.gen()][0]
+        conj_label = lambda label: ideal_label(c(ideal_from_label(K, label)))
+        return HeckeEig(
+            {lab: self.eigenvalues()[conj_label(lab)] for lab in self.eigenvalues()},
+            c(self.level()),
+            self.p(),
+        )
 
     def __repr__(self):
         if self._label:
@@ -91,11 +107,38 @@ class HeckeEig():
     def get_rational_lifts(self):
         return self.rational_lifts
 
+    def get_verified_lifts(self):
+        lift_label = lambda lift: ideal_label(level_from_BMF_label(self.field(), lift))
+        # Since verified_d*.csv uses old data, need to check conjugate level of lift as well.
+        c = self.field().automorphisms()[1]
+        get_conj_label = lambda label: ideal_label(c(ideal_from_label(self.field(), label)))
+
+        conj_form = self.conjugate_form()
+        p_str = str(self.p())
+        
+        evs_match = lambda evs1, evs2: all((ev == evs2[i] or evs2[i] == 0 for i,ev in enumerate(evs1) ))
+
+        verified_lifts = []
+        with open(f"../data/verified_d{self.d()}.csv") as f:
+            csv_reader = csv.reader(f, delimiter=';')
+            for l in csv_reader:
+                file_evs = eval(l[3])
+                cand = self if l[0] == self.level_label() else conj_form;
+                if l[0] == cand.level_label() and l[1] == p_str and evs_match(cand.eigenvalue_list(), file_evs):
+                    lift = next((lift for lift in self.get_rational_lifts() if
+                                 l[2] == (lift_label(lift) if cand is self else get_conj_label(lift_label(lift)))), None)
+                    if lift is not None:
+                        verified_lifts.append(lift)
+        return verified_lifts
+
     def get_irrational_lifts(self):
         return self.irrational_lifts
 
     def get_lifts(self):
         return self.get_rational_lifts() + self.get_irrational_lifts()
+
+    def source_key(self):
+        return self.source
 
     def is_rational(self):
         return self.eigenvalue_list()[0].parent().degree() == 1
@@ -433,21 +476,36 @@ def load_irrat_lifts(d, modp_evs=None):
                 lift_lvl = ideal_from_label(K, r[" lift level"])
                 p = ZZ(r[" prime"])
                 evals = {lab: E(r[lab]).sage() for lab in prime_labels}
-                h = HeckeEig(evals, lift_lvl, 0)
+                h = HeckeEig(evals, lift_lvl, 0, source=(lvl, p))
                 irrat_lifts.append(h)
-    # Since we don't store the exact one, we need to match up with nonliftable:
     if not modp_evs:
         modp_evs = load_unliftable_from_csv(d)
 
-    undetected = irrat_lifts
+    lifts_by_key = {}
+    for h in irrat_lifts:
+        lifts_by_key.setdefault(h.source_key(), []).append(h)
+
+    forms_by_key = {}
     for g in modp_evs:
-        cands = [h for h in irrat_lifts if g.level().divides(h.level()) and is_irrational_lift(h, g)]
-        if len(cands) > 1:
-            print("WARNING: Multiple candidate lifts available for", g)
-            print("Levels:", [c.level_label() for c in cands])
-        for c in cands:
-            g.add_irrational_lift(c)
-            undetected.remove(c)
+        forms_by_key.setdefault((g.level(), g.p()), []).append(g)
+
+    undetected = []
+    for key, lifts in lifts_by_key.items():
+        forms = forms_by_key.get(key, [])
+        if len(forms) == 1:
+            # Unique lift coming from this level, so can add directly
+            for h in lifts:
+                forms[0].add_irrational_lift(h)
+            continue
+        for g in forms:
+            # ...otherwise, match up eigenvalues
+            
+            match = next((h for h in lifts if is_irrational_lift(h, g)), None)
+            if match is None:
+                continue
+            g.add_irrational_lift(match)
+            lifts.remove(match)
+        undetected += lifts
     if len(undetected) > 0:
         print("WARNING: did not find mod p forms for", undetected)
     return irrat_lifts
@@ -603,26 +661,50 @@ def liftable_statistics():
     total_small_p_forms = []
     for d in [1,2,3,7,11]:
         all_forms = load_all_from_csv(d)
-        small_p_forms = [h for h in all_forms if 2 < h.p() < 20]
-        small_forms = [h for h in all_forms if 2 < h.p() < 20 and h.level().norm() <= 500]
+        small_p_forms = [h for h in all_forms if h.p() < 20]
+        small_forms = [h for h in all_forms if h.p() < 20 and h.level().norm() <= 500]
         total_forms += all_forms
         total_small_p_forms += small_p_forms
         total_small_forms += small_forms
         print("\n")
         print(tabulate(make_table(all_forms), headers=[f"d={d}, no conditions", "Count"], tablefmt="grid"), "\n")
-        print(tabulate(make_table(small_p_forms), headers=[f"d={d}, 2 < p < 20", "Count"], tablefmt="simple_grid"))
-        print(tabulate(make_table(small_forms), headers=[f"d={d}, 2 < p < 20, Nm(n) <= 500", "Count"], tablefmt="simple_grid"))
+        print(tabulate(make_table(small_p_forms), headers=[f"d={d}, p < 20", "Count"], tablefmt="simple_grid"))
+        print(tabulate(make_table(small_forms), headers=[f"d={d}, p < 20, Nm(n) <= 500", "Count"], tablefmt="simple_grid"))
         print("\n")
     print("\n")
     print(tabulate(make_table(total_forms), headers=[f"All d, no conditions", "Count"], tablefmt="double_grid"), "\n")
-    print(tabulate(make_table(total_small_p_forms), headers=[f"All d, 2 < p < 20", "Count"], tablefmt="double_grid"))
-    print(tabulate(make_table(total_small_forms), headers=[f"All d, 2 < p < 20, Nm(n) <= 500", "Count"], tablefmt="double_grid"))
+    print(tabulate(make_table(total_small_p_forms), headers=[f"All d, p < 20", "Count"], tablefmt="double_grid"))
+    print(tabulate(make_table(total_small_forms), headers=[f"All d, p < 20, Nm(n) <= 500", "Count"], tablefmt="double_grid"))
     print("\n")
     eigen_table = [["Ethereal forms with multiplicity >1:", len([h for h in all_forms if h.eigenspace_dim() > 1])],
                    ["Ethereal forms with extra generalized eigenspace:", len([h for h in all_forms if h.generalized_eigenspace_dim() > h.eigenspace_dim()])],
                    ["Ethereal forms with extra generalized eigenspace, p>3:", len([h for h in all_forms if h.generalized_eigenspace_dim() > h.eigenspace_dim() and h.p() > 3])],
                    ]
     print(tabulate(eigen_table))
+
+def table_9():
+    all_p_rows = []
+    some_p_rows = []
+    for d in [1,2,3,7,11]:
+        all_p_forms = load_all_from_csv(d)
+        some_p_forms = [h for h in all_p_forms if h.p() < 20]
+        all_p_rows.append([
+            d,
+            len(all_p_forms),
+            len([h for h in all_p_forms if h.has_lift()]),
+            len([h for h in all_p_forms if h.get_verified_lifts()]),
+        ])
+        some_p_rows.append([
+            d,
+            len(some_p_forms),
+            len([h for h in some_p_forms if h.has_lift()]),
+            len([h for h in some_p_forms if h.get_verified_lifts()]),
+        ])
+    print("Table of ethereal forms with p < 20")
+    print(tabulate(some_p_rows,tablefmt="simple_grid", headers=["d", "Eth", "Lifts", "Verif"]))
+    print("Table of ethereal forms, all p")
+    print(tabulate(all_p_rows, tablefmt="simple_grid", headers=["d", "Eth", "Lifts", "Verif"]))
+    
 
 def big_prime_example(tablefmt="simple_grid"):
     """
@@ -681,3 +763,59 @@ def count_LMFDB_lifts():
         evs = load_liftable_from_csv(d)
         print("Total number of forms:", len(evs))
     
+def non_steinberg_lift():
+    """
+    Compute example of non-steinberg lift at p=2 in paper.
+    """
+    from lmf import db
+    cands = [h for h in load_liftable_from_csv(11) if h.p() == 2 and h.level_label() == "23.1"]
+    assert len(cands) == 1
+    h = cands[0]
+    print("Number of lifts:", len(h.get_rational_lifts()))
+    lift_reduction_types(h)
+
+def lift_reduction_types(h, only_new_level=True, kodaira_all_curves=False):
+    """Print table of rational lifts along with reduction types at bad primes.
+
+    The reduction type and conductor exponent only depend on the isogeny class.
+    The Kodaira symbol depends on the individual curve, so by default we print
+    the one corresponding to the first curve in the class, per LMFDB labeling.
+    Set kodaira_all_curves to 'True' to list it for all of them.
+    """
+    reduction_dict = {1: 'split mult (Steinberg)',
+           -1: 'nonsplit mult (Steinberg)',
+           0: 'additive (non-Steinberg)',
+           }
+
+    from lmf import db
+    K = h.field()
+    labels = h.get_rational_lifts()
+    query = {'class_label': {'$in': labels}}
+    if not kodaira_all_curves:
+        query['number'] = 1
+    found = {}
+    for r in db.ec_nfcurves.search(query,
+            ['class_label', 'conductor_label', 'local_data', 'semistable', 'number']):
+        found.setdefault(r['class_label'], []).append(r)
+
+    table = []
+    for lab in labels:
+        curves = found.get(lab)
+        if curves is None:
+            table.append([lab, '-', 'no curve in LMFDB', '', '', ''])
+            continue
+        kods = {}
+        for c in curves:
+            for ld in c['local_data']:
+                q = K.ideal(sage_eval(ld['p'], locals={'w': K.gen()}))
+                kods.setdefault(q, []).append(str(KodairaSymbol(ld['kod'])))
+        for ld in curves[0]['local_data']:
+            q = K.ideal(sage_eval(ld['p'], locals={'w': K.gen()}))
+            if only_new_level and q.divides(h.level()):
+                continue                      # skip primes already in the mod p level
+            table.append([lab, prime_label(q), reduction_dict[ld['red']],
+                          ", ".join(dict.fromkeys(kods[q])),
+                          ld['ord_cond'], curves[0]['semistable']])
+    print(tabulate(table, headers=['lift', 'q', 'reduction at q', 'Kodaira', 'ord_q(N)', 'semistab'],
+                   tablefmt='simple_grid'))
+    return table
