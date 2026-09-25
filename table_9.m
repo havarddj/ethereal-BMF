@@ -1,5 +1,5 @@
 
-AttachSpec("../spec");
+AttachSpec("BMF/spec");
 
 
 function VerifiedData(d)

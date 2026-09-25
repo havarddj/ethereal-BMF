@@ -1,4 +1,4 @@
-AttachSpec("../spec");
+AttachSpec("BMF/spec");
 load "homology_torsion.m";
 
 

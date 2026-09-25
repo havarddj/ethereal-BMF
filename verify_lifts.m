@@ -1,6 +1,3 @@
-
-AttachSpec("../spec");
-
 load "look_for_lifts.m";
 
 d := 7;

@@ -1,4 +1,4 @@
-AttachSpec("../spec");
+AttachSpec("BMF/spec");
 
 function LoadForm(d,p,lvl_label, evals : HeckeBd := 30)
     // Helper function to load form from value of d, p, the level label, and eigenvalues evals
@@ -248,53 +248,6 @@ function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, f
     return "None found";
 end function;
 
-
-
-
-/*
-Attempts to find lifts of Bianchi cohomology class with irrational coefficients which is given as a string in the format
-
-127.1;7;[ 1, 4 ];[ 1, 2 ];[ 5, 2 ];[ 5, 2 ];[ 0, 3 ];x^2 + 6*x + 3
-
-where 
-- the first entry is the level
-- the second is the prime p,
-- the last entry is the characteristic polynomial of the extension in which the Hecke eigenvalues lie
-- the rest of the entries correspond to Hecke eigenvalues
-*/
-
-// function BatchFindIrrationalLifts(d : lvlUpperBd := 100)
-//     F := QuadFld(d);
-//     filename := "data/nonEis_d" cat Sprint(d) cat ".csv";
-//     lines := Split(Read(filename), "\n");
-//     header := Split(lines[1], ";");
-//     primeLabels := header[3..#header-1];
-//     primeList := [LMFDBIdeal(F,label) : label in primeLabels];
-
-//     for line in lines[2..#lines] do
-// 	entries := Split(line, ";");
-// 	if "x" notin entries[#entries] or forall{ 1 : e in entries[3..#entries-1] | "[" notin e} then
-// 	    continue;
-// 	end if;
-
-// 	lvl := LMFDBIdeal(F, entries[1]);
-// 	p := StringToInteger(entries[2]);
-// 	// skip small primes
-// 	if p eq 2 then continue; end if;
-	
-// 	B := BianchiCohomologySpace(lvl, BianchiWeight(F,0,0 : char :=p));
-// 	f := ReadClass(line, B, primeList);
-// 	print "Finding lifts for", f, "; this may take time";
-// 	f0 := FindLifts(f : lvlUpperBd := lvlUpperBd, at_p := true);
-// 	if Type(f0) eq Type("Foo") then
-// 	    print f0;
-// 	    // print "++++FOUND LIFT++++", f0;
-// 	end if;
-//     end for;
-//     return 0;
-// end function;
-
-
 /*
 Helper function to load rational lifts.
 */
@@ -325,21 +278,6 @@ function LoadAllLifts(d : startBd := 0, stopBd := 1000)
     end for;
     return forms;
     
-end function;
-
-
-// Check whether p divides the index of Gamma0(J) in Gamma0(I).
-// Heuristically, this is expected if the H^2 degeneracy map
-// kills the lifting obstruction 
-// NOTE: not sure if this is correct; in any case it seems to always return false, so WIP
-function CanKillLiftingObstr(p, I,J)
-    assert I subset J;
-    primes := [pp : pp in Divisors(J) | IsPrime(pp) and IsCoprime(I,pp)];
-    if primes ne [] then
-	return Norm(J)/Norm(I)* &*primes subset Parent(I)!p;
-    else
-	return false;
-    end if;
 end function;
 
 function CheckNonrationalLift(F, line, topLine : lvlLowerBd :=0, lvlUpperBd := 10000, recompute := false, heckeBd := 200)
@@ -417,10 +355,6 @@ function CheckCubicNonrationalLift()
 
 end function;
 
-// function CheckNonRationalLift5()
-//     line := "281.2;5;[ 2, 1 ];[ 2, 3 ];[ 2, 2 ];[ 2, 1 ];[ 2, 0 ];[ 1, 0 ];[ 3, 1 ];[ 4, 3 ];0;[ 4, 1 ];[ 0, 2 ];[ 0, 0 ];[ 3, 0 ];[ 2, 0 ];[ 0, 1 ];[ 3, 3 ];[ 4, 2 ];[ 0, 1 ];[ 0, 3 ];[ 4, 3 ];[ 0, 1 ];[ 1, 3 ];[ 1, 0 ];x^2 + 4*x + 2"
-// end function;
-
 function CheckMultiplicityWeird()
     // TODO: check that there's nothing at same level!
     p := 11;
@@ -453,7 +387,7 @@ end function;
 // Look for lifts which sage couldn't find in the lmfdb
 
 /*
-The main idea is to do various passes with different interals
+The main idea is to do various passes with different intervals
 specified by lvlLowerBd and lvlUpperBd. For high levels, it might be a
 good idea to set recompute := true, since by default, we only store
 eigenvalues up to norm 100.
