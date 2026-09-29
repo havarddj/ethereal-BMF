@@ -86,7 +86,7 @@ function VerifyIrrationalLift(d,str)
 	end if;
 
 
-	// now we do the usual level-raising stuff
+	// now we do the usual level-raising procedure.
 	B := Parent(f);
 
 	// for annoying reasons we need to re-define K here. bah! 
@@ -94,11 +94,15 @@ function VerifyIrrationalLift(d,str)
 	level := LMFDBIdeal(K,levelLabel);
 	liftLevel := LMFDBIdeal(K,ss[3]);
 	B0 := BianchiCohomologySpace(liftLevel, BianchiWeight(K,0,0));
-	Bp := BianchiCohomologySpace(liftLevel, BianchiWeight(K,0,0 : char := pp));
+	Bp := BianchiCohomologySpace(liftLevel, Weight(B));
 
-	levelRaise := [RaiseCocycleLevel(B,Bp,f,dd) : dd in Divisors(liftLevel/level)];
-	red := CharacteristicZeroImage(Bp,B0);
-	LR := sub<Bp`forms | [u`vector : u in levelRaise]>;
+	// when f is defined over a larger field than GF(p), we need to change all the rings.
+	Rf := CoefficientRing(f);
+	BBp := ChangeRing(Bp,Rf);
+
+	levelRaise := [RaiseCocycleLevel(B,BBp,f,dd) : dd in Divisors(liftLevel/level)];
+	red := ChangeRing(CharacteristicZeroImage(Bp,B0),Rf);
+	LR := sub<BBp`forms | [u`vector : u in levelRaise]>;
 
 	return Dimension(LR meet red) gt 0, form_str;
 end function;
@@ -107,7 +111,7 @@ end function;
 
 procedure VerifyIrrational(d)
 	outFileName := "data/verified_irrational_d" cat Sprint(d) cat ".csv";
-	lines := Split(Read("data/irrat_lifts_d" cat Sprint(d) cat "_v2.csv"));
+	lines := Split(Read("data/irrat_lifts_d" cat Sprint(d) cat ".csv"));
 	SetColumns(0);
 	for l in lines[2..#lines] do 
 		ll := Split(l,";");
