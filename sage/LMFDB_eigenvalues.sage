@@ -41,7 +41,7 @@ class HeckeEig():
         self.eig_dim = eig_dim
         self.gen_dim = gen_dim
         # For a char. 0 lift: the (level, p) of the mod p form it lifts
-        # in ../data/irrat_lifts_d*_v2.csv.
+        # in ../data/irrat_lifts_d*.csv.
         self.source = source
 
     def conjugate_form(self):
@@ -276,7 +276,7 @@ def find_congruent_forms(d, input_file = None, find_all_lifts = False):
     OK = K.maximal_order()
     label = f"2.0.{K.discriminant().abs()}.1"
     if input_file is None:
-        input_file = f"../data/nonEis_d{d}_v2.csv"
+        input_file = f"../data/nonEis_d{d}.csv"
 
     # load mod p BMFs from input_file
     # this is small enough that it doesn't make sense to use an iterator.
@@ -366,11 +366,11 @@ def write_congruent_forms(d, modp_evs = None):
     print(f"Wrote unliftable eigenvalues to", f'd{d}_unliftable.csv')
 
 def load_nonEis(d):
-    """ Load all Hecke eigenvalue systems from nonEis_dX_v2.csv files
+    """ Load all Hecke eigenvalue systems from nonEis_dX.csv files
     """
     K = QuadFld(d)
     
-    input_file = f"../data/nonEis_d{d}_v2.csv"
+    input_file = f"../data/nonEis_d{d}.csv"
     
     modp_evs = []
     with open(input_file) as f:
@@ -458,7 +458,7 @@ def load_irrat_lifts(d, modp_evs=None):
     """
     K = QuadFld(d)
     irrat_lifts = []
-    irrat_file= f'../data/irrat_lifts_d{d}_v2.csv'
+    irrat_file= f'../data/irrat_lifts_d{d}.csv'
     print(f"Loading irrational lifts from {irrat_file}, this might take a while.")
     _ = magma.eval('R<x> := PolynomialRing(Integers())')
 
@@ -550,7 +550,7 @@ def ul_filter_csv(d):
     Create magma-readable file with EBMFs which don't lift in the lmfdb
     """
     F = QuadFld(d)
-    input_file = f"../data/nonEis_d{d}_v2.csv"
+    input_file = f"../data/nonEis_d{d}.csv"
     output_file = f"../data/lmfdbNonlift_d{d}.csv"
 
     # irrational forms automatically don't lift, so copy line from nonEis directly
