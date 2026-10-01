@@ -5,7 +5,7 @@ load "loading.m";
 
 // returns true if cohomology can verify the lift specified by the string `str`,
 // a line in irrat_lifts_d*.csv.
-function VerifyIrrationalLift(d,str)
+function VerifyIrrationalLift(d,str : lvlMin := 0, lvlMax := 1000, liftLvlMax := 10000)
 	K := QuadFld(d);
 	ZK := MaximalOrder(K);
 	ss := Split(str,";");
@@ -13,6 +13,10 @@ function VerifyIrrationalLift(d,str)
 	levelLabel := ss[1];
 	level := LMFDBIdeal(K,levelLabel);
 	liftLevel := LMFDBIdeal(K,ss[3]);
+	if Norm(level) lt lvlMin or Norm(level) gt lvlMax or Norm(liftLevel) gt liftLvlMax then 
+		print "Skipping level", levelLabel; 
+		return false, false;
+	end if;
 	p := ss[2];
 	pp := StringToInteger(p);
 
@@ -41,7 +45,7 @@ function VerifyIrrationalLift(d,str)
 		f := eval ss[#ss];
 		F := NumberField(f);
 		ZF := MaximalOrder(F);
-		char0Eigs := [F!(eval u) : u in ss[4..#ss-1]];
+		char0Eigs := [F!u : u in ss[4..#ss-1]];
 
 		// this collects all possible mod p reductions of the char 0 system 
 		PP := [f[1] : f in Factorization(pp*ZF)];
@@ -109,14 +113,14 @@ end function;
 
 
 
-procedure VerifyIrrational(d)
+procedure VerifyIrrational(d : lvlMin := 0, lvlMax := 1000, liftLvlMax := 10000)
 	outFileName := "data/verified_irrational_d" cat Sprint(d) cat ".csv";
 	lines := Split(Read("data/irrat_lifts_d" cat Sprint(d) cat ".csv"));
 	SetColumns(0);
 	for l in lines[2..#lines] do 
 		ll := Split(l,";");
 		if ll[3] ne "None found" and ll[3] ne "No level raising primes available" then
-			tt, str := VerifyIrrationalLift(d,l);
+		tt, str := VerifyIrrationalLift(d,l : lvlMin := lvlMin, lvlMax := lvlMax, liftLvlMax := liftLvlMax);
 
 			// if we have a verified lift, we build the string and add it to the relevant file
 			if tt then 
