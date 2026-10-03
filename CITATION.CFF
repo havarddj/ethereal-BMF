@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Combes"
+  given-names: "Lewis"
+  orcid: "https://orcid.org/0000-0002-7576-0966"
+- family-names: "Damm-Johnsen"
+  given-names: "Håvard"
+  orcid: "https://orcid.org/0009-0000-5686-3225"
+title: "ethereal-BMF"
+version: 1.0.0
+doi: 10.5281/zenodo.1234
+date-released: 2026-10-03
+url: "https://github.com/havarddj/ethereal-BMF"
