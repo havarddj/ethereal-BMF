@@ -220,8 +220,8 @@ procedure Example_4_7()
 end procedure;
 
 
-// Verifies Example 4.8
-procedure Example_4_8()
+// Verifies Example 4.9
+procedure Example_4_9()
 	K := QuadFld(3);
 	ZK := MaximalOrder(K);
 	level := LMFDBIdeal(K,"931.2");
