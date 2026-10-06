@@ -1,12 +1,12 @@
 
-AttachSpec("BMF/spec");
+AttachSpec("../BMF/spec");
 
 
 function VerifiedData(d)
 	K := QuadFld(d);
 	ZK := MaximalOrder(K);
 
-	input := "data/verified_d" cat Sprint(d) cat ".csv";
+	input := "../data/verified_d" cat Sprint(d) cat ".csv";
 	lines := Split(Read(input), "\n");
 
 	p_le20 := [];
@@ -25,9 +25,9 @@ function AllLifts(d)
 	K := QuadFld(d);
 	ZK := MaximalOrder(K);
 
-	lmfdb_lifts := Split(Read("sage/d" cat Sprint(d) cat "_liftable.csv"));
+	lmfdb_lifts := Split(Read("../sage/d" cat Sprint(d) cat "_liftable.csv"));
 	lmfdb_lifts := lmfdb_lifts[2..#lmfdb_lifts];
-	irrat_data := Split(Read("data/irrat_lifts_d" cat Sprint(d) cat "_v2.csv"));
+	irrat_data := Split(Read("../data/irrat_lifts_d" cat Sprint(d) cat ".csv"));
 
 	lmfdb_lifts_ple20 := [];
 	irrat_lifts := [];
@@ -66,7 +66,7 @@ function EtherealData(d)
 	K := QuadFld(d);
 	ZK := MaximalOrder(K);
 
-	eth := Split(Read("data/nonEis_d" cat Sprint(d) cat "_v2.csv"));
+	eth := Split(Read("../data/nonEis_d" cat Sprint(d) cat ".csv"));
 
 	ethereal := [];
 	ethereal_ple20 := [];
@@ -116,7 +116,7 @@ end for;
 
 
 
-d := 11;
+d := 2;
 eth, eth20 := EtherealData(d);
 lifts, lifts20 := AllLifts(d);
 ver, ver20 := VerifiedData(d);
