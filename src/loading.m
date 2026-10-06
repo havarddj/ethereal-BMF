@@ -59,7 +59,7 @@ function LoadForm_liftable(d,str)
 	W := BianchiWeight(K, 0, 0 : char := p);
 	B := BianchiCohomologySpace(level, W);
 
-	s := Split(Read("data/nonEis_d" cat Sprint(d) cat ".csv"),"\n")[1];
+	s := Split(Read("../data/nonEis_d" cat Sprint(d) cat ".csv"),"\n")[1];
 	// this cuts out just the part of the string with the labels 
 	pp := s[9..#s-14];
 	PP := [LMFDBIdeal(K,u) : u in Split(pp,";")];
@@ -77,7 +77,7 @@ function LoadForm_nonEis(d,str)
 	ss := Split(str,";");
 
 	// gathering prime labels 
-	s := Split(Read("data/nonEis_d" cat Sprint(d) cat ".csv"),"\n")[1];
+	s := Split(Read("../data/nonEis_d" cat Sprint(d) cat ".csv"),"\n")[1];
 	pp := s[9..#s-34];
 	PP := [LMFDBIdeal(K,u) : u in Split(pp,";")];
 

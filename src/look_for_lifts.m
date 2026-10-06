@@ -1,7 +1,6 @@
-AttachSpec("BMF/spec");
 
-
-
+AttachSpec("../BMF/spec");
+load "loading.m";
 
 function FindLifts(f : lvlLowerBd := 0, lvlUpperBd := 1000000 , at_p := false, from_data := false, heckeBd := 100)
     // the `from_data` parameter lets us use level-raise primes we might have computed up to a larger bound.
