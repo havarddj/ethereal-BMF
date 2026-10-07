@@ -71,6 +71,7 @@ class HeckeEig():
 
     def level_label(self):
         return ideal_label(self.level())
+
     def label(self):
         return self.label
     
@@ -88,6 +89,29 @@ class HeckeEig():
 
     def eigenvalue_list(self):
         return [v for _,v in self.eigenvalues().items()]
+
+    def is_admissible(self):
+        """True if some integer M = a (mod p) has |M| <= 2*sqrt(Nm(q)).
+        """
+        # Fq-eigenvalue systems forms for q = p^s, s > 1, are not admissible!
+        if not self.is_rational():
+            # print("Not admissible because irrational")
+            return False
+        LR_primes = self.LR_primes()
+        good_primes = self.good_primes()
+        for (lab, ap) in self.eigenvalues().items():
+            if lab in LR_primes or lab not in good_primes:
+                continue
+
+            # Much faster than running "ideal_from_label" on each!
+            pp_norm = ZZ(lab.split(".")[0])
+            r = ZZ(ap)                  
+            M = min(r, self.p() - r)  # smallest |M| with M = a_pp mod p
+            if M^2 > 4 * pp_norm:
+                # print("Found bad mod p guy")
+                return False
+                
+        return True
 
     def add_rational_lift(self, lift):
         self.rational_lifts.append(lift)
@@ -190,7 +214,7 @@ class HeckeEig():
                         print(f"Lift has level {lift.level_label()} = {[(ideal_label(pp), m) for (pp,m) in lift.level().factor()]}")
                         print("Hecke eigenvalues defined over", E, "of discriminant", E.discriminant(), "=", E.discriminant().factor())
                         table = [[lab + ("*" if lab not in good_labels else ""),
-                                  self.eigenvalues()[lab],
+                                  phi(self.eigenvalues()[lab]),
                                   Epp(lift.eigenvalues()[lab]),
                                   E(lift.eigenvalues()[lab]),
                                   ] for lab in self.eigenvalues()]
@@ -225,7 +249,7 @@ class HeckeEig():
 
     def non_LR_primes(self, lift):
         """
-        return list of primes not satisfying the level raising condition
+        Return list of primes not satisfying the level raising condition.
         """
         non_LR_primes = []
         p = self.p()
@@ -250,13 +274,14 @@ class HeckeEig():
     def LR_primes(self, bd=100):
         LR_primes = []
         p = self.p()
-        for i,pp in enumerate(primes_iter(self.field())):
+        for i, pp in enumerate(primes_iter(self.field())):
             if pp.norm() > bd or i >= len(self.eigenvalues()):
                 return LR_primes
             else:
-                modp_diff = (self.eigenvalues()[i]^2 - (1 + norm(pp))^2) % p
+                lab = prime_label(pp)
+                modp_diff = (ZZ(self.eigenvalues()[lab]^2) - (1 + norm(pp))^2) % p
                 if modp_diff == 0:
-                    LR_primes.append(prime_label(pp))
+                    LR_primes.append(lab)
         
         
 
@@ -431,6 +456,11 @@ def load_unliftable_from_csv(d):
     return modp_evs
 
 def load_liftable_from_csv(d):
+    """
+    Load stored Hecke eigenvalue systems with higher level lifts in the LMFDB,
+    from ./d*_liftable.csv.
+    Does NOT search
+    """
     K = QuadFld(d)
     modp_evs = []
     with open(f'd{d}_liftable.csv', 'r', newline='') as f:
@@ -682,140 +712,12 @@ def liftable_statistics():
                    ]
     print(tabulate(eigen_table))
 
-def table_9():
-    all_p_rows = []
-    some_p_rows = []
-    for d in [1,2,3,7,11]:
-        all_p_forms = load_all_from_csv(d)
-        some_p_forms = [h for h in all_p_forms if h.p() < 20]
-        all_p_rows.append([
-            d,
-            len(all_p_forms),
-            len([h for h in all_p_forms if h.has_lift()]),
-            len([h for h in all_p_forms if h.get_verified_lifts()]),
-        ])
-        some_p_rows.append([
-            d,
-            len(some_p_forms),
-            len([h for h in some_p_forms if h.has_lift()]),
-            len([h for h in some_p_forms if h.get_verified_lifts()]),
-        ])
-    print("Table of ethereal forms with p < 20")
-    print(tabulate(some_p_rows,tablefmt="simple_grid", headers=["d", "Eth", "Lifts", "Verif"]))
-    print("Table of ethereal forms, all p")
-    print(tabulate(all_p_rows, tablefmt="simple_grid", headers=["d", "Eth", "Lifts", "Verif"]))
-    
-
-def big_prime_example(tablefmt="simple_grid"):
-    """
-    Print eigenvalue table for mod 379 lift, with char 0 eigenvalues coerced to cyclotomic field
-    """
-    h = [h for h in load_all_from_csv(7) if h.p() >300 and h.has_lift()][0]
-    print(h)
-    if not h.has_irrational_lift():
-        return "No irrational lifts; rational lifts not currently supported."
-    lift = h.get_irrational_lifts()[0]
-    F = h.field()
-    p = h.p()
-    Eself = h.coefficient_field()
-    print(f"Table of lifts of {h} over Q(\sqrt(-{h.d()}))")
-    E2 = lift.coefficient_field()
-    L.<zeta7> = CyclotomicField(7, embedding=None)
-    E = L
-    i = E2.embeddings(L)[0]    
-    cands = [pp for (pp, _) in E.ideal(p).factor() if pp.residue_class_degree() == 1]
-    print(f"Splitting behavior of p={p} in Hecke field: (Nm, f, e)", [(pp.norm(), pp.residue_class_degree(), pp.ramification_index()) for (pp,_) in E.ideal(p).factor()])
-    for pp in cands:
-        assert pp.is_principal()
-        pp_gen = pp.gens_reduced()[0]
-        Epp = E.residue_field(pp)
-        for phi in Eself.Hom(Epp):
-            good_labels = [lab for lab in lift.good_primes() if ideal_from_label(F, lab).is_coprime(F.ideal(p))]
-            if all([phi(e) == Epp(i(lift.eigenvalues()[lab])) for (lab,e) in h.eigenvalues().items() if lab in good_labels]):
-                print(f"Found correct ideal, reducing mod {pp_gen}")
-                print(f"Lift has level {lift.level_label()} = {[(ideal_label(pp), m) for (pp,m) in lift.level().factor()]}")
-                print("Hecke eigenvalues defined over", E2, "of discriminant", E2.discriminant(), "=", E2.discriminant().factor())
-                table = [[lab + ("*" if lab not in good_labels else ""),
-                            h.eigenvalues()[lab],
-                            Epp(i(lift.eigenvalues()[lab])),
-                            E(i(lift.eigenvalues()[lab])),
-                            ] for lab in h.eigenvalues()]
-                print(tabulate(table, tablefmt=tablefmt, headers=["$\p$",
-                                                                  "$a_{\p}(f)$",
-                                                                  f"$a_{{\p}}(F) \Mod {pp_gen}$",
-                                                                  "$a_{\p}(F)$",
-                                                                  ]))
-    return 1
-
-
-def big_field_example():
-    """
-    Print eigenvalue table of large degree
-    """
-    evs = load_all_from_csv(7) 
-    h = [h for h in evs if len([l for l in h.get_irrational_lifts() if l.coefficient_field().degree() >= 7]) > 0][0]
-
-    return h.tabulate_lift_evals()
 
 
 def count_LMFDB_lifts():
     for d in [1,2,3,7,11]:
         evs = load_liftable_from_csv(d)
-        print("Total number of forms:", len(evs))
+        print(f"Total number of forms: (d = {d}):", len(evs))
+        print(f"Total number of forms: (d = {d}, p < 20):", sum([1 for h in evs if h.p() < 20]))
     
-def non_steinberg_lift():
-    """
-    Compute example of non-steinberg lift at p=2 in paper.
-    """
-    from lmf import db
-    cands = [h for h in load_liftable_from_csv(11) if h.p() == 2 and h.level_label() == "23.1"]
-    assert len(cands) == 1
-    h = cands[0]
-    print("Number of lifts:", len(h.get_rational_lifts()))
-    lift_reduction_types(h)
 
-def lift_reduction_types(h, only_new_level=True, kodaira_all_curves=False):
-    """Print table of rational lifts along with reduction types at bad primes.
-
-    The reduction type and conductor exponent only depend on the isogeny class.
-    The Kodaira symbol depends on the individual curve, so by default we print
-    the one corresponding to the first curve in the class, per LMFDB labeling.
-    Set kodaira_all_curves to 'True' to list it for all of them.
-    """
-    reduction_dict = {1: 'split mult (Steinberg)',
-           -1: 'nonsplit mult (Steinberg)',
-           0: 'additive (non-Steinberg)',
-           }
-
-    from lmf import db
-    K = h.field()
-    labels = h.get_rational_lifts()
-    query = {'class_label': {'$in': labels}}
-    if not kodaira_all_curves:
-        query['number'] = 1
-    found = {}
-    for r in db.ec_nfcurves.search(query,
-            ['class_label', 'conductor_label', 'local_data', 'semistable', 'number']):
-        found.setdefault(r['class_label'], []).append(r)
-
-    table = []
-    for lab in labels:
-        curves = found.get(lab)
-        if curves is None:
-            table.append([lab, '-', 'no curve in LMFDB', '', '', ''])
-            continue
-        kods = {}
-        for c in curves:
-            for ld in c['local_data']:
-                q = K.ideal(sage_eval(ld['p'], locals={'w': K.gen()}))
-                kods.setdefault(q, []).append(str(KodairaSymbol(ld['kod'])))
-        for ld in curves[0]['local_data']:
-            q = K.ideal(sage_eval(ld['p'], locals={'w': K.gen()}))
-            if only_new_level and q.divides(h.level()):
-                continue                      # skip primes already in the mod p level
-            table.append([lab, prime_label(q), reduction_dict[ld['red']],
-                          ", ".join(dict.fromkeys(kods[q])),
-                          ld['ord_cond'], curves[0]['semistable']])
-    print(tabulate(table, headers=['lift', 'q', 'reduction at q', 'Kodaira', 'ord_q(N)', 'semistab'],
-                   tablefmt='simple_grid'))
-    return table
