@@ -7,15 +7,15 @@ BianchiPresentation:=function(disc : GL:=true)
     if GL then 
 
 	if disc eq -3 then 
-	    return Group<t, tw, s, j | s^2 = (t*s)^3 = (t*s*tw*s*tw^-1*s*t^-1)^2 = (t^-1*tw*t*s*tw*s*tw^-1*s*t^-1)^3 = ((s*t*s*tw*s*tw^-1*s*t^-1)^-1*t^-1*tw*(s*t*s*tw*s*tw^-1*s*t^-1)*t^-1) = (s*t*s*tw*s*tw^-1*s*t^-1)^-1*t*(s*t*s*tw*s*tw^-1*s*t^-1)*tw = t*tw*t^-1*tw^-1 = j^-1 * t *j * tw * t^-1 = j^-1*tw*j*t^-1 = j^-1 * s * j *(t*s*tw*s*tw^-1*s*t^-1) = 1 >;
+	    return Group<t, tw, s, j | j^2 * (s*t*s*tw*s*tw^-1*s*t^-1)^-1 = s^2 = (t*s)^3 = (t*s*tw*s*tw^-1*s*t^-1)^2 = (t^-1*tw*t*s*tw*s*tw^-1*s*t^-1)^3 = ((s*t*s*tw*s*tw^-1*s*t^-1)^-1*t^-1*tw*(s*t*s*tw*s*tw^-1*s*t^-1)*t^-1) = (s*t*s*tw*s*tw^-1*s*t^-1)^-1*t*(s*t*s*tw*s*tw^-1*s*t^-1)*tw = t*tw*t^-1*tw^-1 = j^-1 * t *j * tw * t^-1 = j^-1*tw*j*t^-1 = j^-1 * s * j *(t*s*tw*s*tw^-1*s*t^-1) = 1 >;
     elif disc eq -4 then 
-		return Group<t, tw, s, j | s^2 = (s*tw^-1*s*tw*s*tw^-1)^2 = (s*(s*tw^-1*s*tw*s*tw^-1))^2 = (t*(s*tw^-1*s*tw*s*tw^-1))^2 = (tw*(s*tw^-1*s*tw*s*tw^-1))^2 = (t*s)^3 = (tw*s*(s*tw^-1*s*tw*s*tw^-1))^3 = t*tw*t^-1*tw^-1 = j^-1*t*j*tw = j^-1*tw*j*t^-1 = j^-1*s*j * (tw^-1*s*tw*s*tw^-1) = 1 >;
+		return Group<t, tw, s, j | j^2 * (s*tw^-1*s*tw*s*tw^-1)^-1 = s^2 = (s*tw^-1*s*tw*s*tw^-1)^2 = (s*(s*tw^-1*s*tw*s*tw^-1))^2 = (t*(s*tw^-1*s*tw*s*tw^-1))^2 = (tw*(s*tw^-1*s*tw*s*tw^-1))^2 = (t*s)^3 = (tw*s*(s*tw^-1*s*tw*s*tw^-1))^3 = t*tw*t^-1*tw^-1 = j^-1*t*j*tw = j^-1*tw*j*t^-1 = j^-1*s*j * (tw^-1*s*tw*s*tw^-1) = 1 >;
     elif disc eq -7 then 
-		return Group<t, tw, s, j | s^2 = (t*s)^3 = t*tw*t^-1*tw^-1 = (tw^-1*s*tw*s*t)^2 = j^-1*t*j*t = j^-1*tw*j*tw = j^-1*s*j*s = 1 >;
+		return Group<t, tw, s, j | j^2 = s^2 = (t*s)^3 = t*tw*t^-1*tw^-1 = (tw^-1*s*tw*s*t)^2 = j^-1*t*j*t = j^-1*tw*j*tw = j^-1*s*j*s = 1 >;
     elif disc eq -8 then 
-		return Group<t, tw, s, j | s^2 = (t*s)^3 = t*tw*t^-1*tw^-1 = (s*tw*s*tw^-1)^2 = j^-1*t*j*t = j^-1*tw*j*tw = j^-1*s*j*s = 1 >;
+		return Group<t, tw, s, j | j^2 = s^2 = (t*s)^3 = t*tw*t^-1*tw^-1 = (s*tw*s*tw^-1)^2 = j^-1*t*j*t = j^-1*tw*j*tw = j^-1*s*j*s = 1 >;
     elif disc eq -11 then 
-		return Group<t, tw, s, j | s^2 = (t*s)^3 = t*tw*t^-1*tw^-1 = (tw^-1*s*tw*s*t)^3 = j^-1*t*j*t = j^-1*tw*j*tw = j^-1*s*j*s = 1 >;
+		return Group<t, tw, s, j | j^2 = s^2 = (t*s)^3 = t*tw*t^-1*tw^-1 = (tw^-1*s*tw*s*t)^3 = j^-1*t*j*t = j^-1*tw*j*tw = j^-1*s*j*s = 1 >;
 	end if;
 
     else 
@@ -123,11 +123,6 @@ function ComputeLevelsAndPrimes(d : lowerBound := 1, upperBound:= 1000)
     return data;
 
 end function;
-
-
-
-
-
 
 
 
