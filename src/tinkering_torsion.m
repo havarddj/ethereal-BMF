@@ -123,7 +123,7 @@ end for;
 
 ///////////
 
-/*
+
 AttachSpec("~/Dropbox/Bianchi mod p periods/CODE/!archive/KleinianGroups/klngpspec");
 
 function QuatToMatrix(g)
@@ -136,11 +136,42 @@ function MatrixToQuat(m,O)
 	return (m[1,1]*(1+i)+m[2,2]*(1-i)+m[1,2]*(j+k)+m[2,1]*(j-k))/2;
 end function;
 
-d := -3;
-O := BianchiOrder(d);
-_, F, E := NormalizedBasis(O : GroupType := "Units");
-P, gens := Presentation(F, E, O);   // P ≅ PGL2(O_K), gens are elements of O
 
-*/
+
+for d in [1,2,3,7,11] do 
+
+	
+	O := BianchiOrder(-d);
+	_, F, E := NormalizedBasis(O : GroupType := "Units");
+	P, gens := Presentation(F, E, O);   // P ≅ PGL2(O_K), gens are elements of O
+
+	PP := Simplify(P);
+	G := BianchiPresentationNew(Discriminant(CoefficientRing(O)));
+
+	effort := 1;
+	ran_out := false;
+	is_isom := false;
+	while not is_isom do 
+		is_isom := SearchForIsomorphism(PP,G,effort);
+		effort +:= 1;
+		if effort eq 15 then 
+			ran_out := true;
+			break;
+		end if;
+	end while;
+
+	if ran_out then
+		printf "Ran out of effort trying to find isomorphism for d = %o\n";
+	else 
+		if is_isom then 
+			printf "Found isomorphism for d = %o with effort %o\n", d, effort;
+		else
+			printf "Couldn't find isomorphism for d = %o", d;
+		end if;
+	end if;
+end for;
+
+
+
 
 
